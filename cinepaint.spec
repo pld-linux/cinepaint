@@ -1,7 +1,5 @@
-#
-#
-Summary:	CinePaint - A Motion picture editing tool
-Summary(pl):	CinePaint - Narzêdzie do obróbki filmów
+Summary:	CinePaint - a motion picture editing tool
+Summary(pl):	CinePaint - narzêdzie do obróbki filmów
 Name:		cinepaint
 Version:	0.18
 Release:	2
@@ -24,19 +22,20 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 CinePaint is a motion picture editing tool primarily used for painting
 and retouching of movies. CinePaint is the most successful open source
-tool in future motion picture work today.
+tool in future motion picture work today. It was formerly known as
+FilmGimp.
 
 %description -l pl
 CinePaint jest narzêdziem do obróbki ruchomego obrazu, u¿ywanym
 g³ównie do rysowania i retuszu filmów. Na dzieñ dzisiejszy jest
 narzêdziem z otwartymi ¼ród³ami, które odnios³o najwiêkszy sukces w
-bran¿y filmowej.
+bran¿y filmowej. Wcze¶niej by³o znane pod nazw± FilmGimp.
 
 %package devel
 Summary:	Header files for CinePaint libraries
 Summary(pl):	Pliki nag³ówkowe bibliotek CinePainta
 Group:		X11/Development/Libraries
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 Obsoletes:	filmgimp-devel
 
 %description devel
@@ -49,7 +48,8 @@ Pliki nag³ówkowe bibliotek CinePainta.
 Summary:	Static CinePaint libraries
 Summary(pl):	Statyczne biblioteki CinePaint
 Group:		X11/Development/Libraries
-Requires:	%{name}-devel = %{version}
+Requires:	%{name}-devel = %{version}-%{release}
+Obsoletes:	filmgimp-static
 
 %description static
 Static CinePaint libraries.
