@@ -88,17 +88,16 @@ rm -rf $RPM_BUILD_ROOT
 #%doc AUTHORS ChangeLog NEWS README
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
-%dir %{_libdir}/%{name}/%{src}/
+%{_libdir}/%{name}/%{src}
 %dir %{_libdir}/%{name}/%{src}/plug-ins/
-%{_libdir}/%{name}/%{src}/plug-ins/*
 %attr(755,root,root) %{_libdir}/%{name}/%{src}/plug-ins/*
-%dir %{_datadir}/%{name}/%{src}/
-%dir %{_datadir}/%{name}/%{src}/*
 # resource directories
-%{_datadir}/%{name}/%{src}/brushes/*
-%{_datadir}/%{name}/%{src}/gradients/*
-%{_datadir}/%{name}/%{src}/palettes/*
-%{_datadir}/%{name}/%{src}/patterns/*
+%dir %{_datadir}/%{name}
+%dir %{_datadir}/%{name}/%{src}
+%{_datadir}/%{name}/%{src}/brushes
+%{_datadir}/%{name}/%{src}/gradients
+%{_datadir}/%{name}/%{src}/palettes
+%{_datadir}/%{name}/%{src}/patterns
 #%{_datadir}*/scripts
 # default rc(?)
 %{_datadir}/%{name}/%{src}/gimprc*
