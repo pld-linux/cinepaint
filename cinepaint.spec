@@ -1,11 +1,14 @@
+%define		rel	3
+%define		ver	0.18
+%define		src	%{ver}-%{rel}
 Summary:	CinePaint - a motion picture editing tool
 Summary(pl):	CinePaint - narzêdzie do obróbki filmów
 Name:		cinepaint
-Version:	0.18
+Version:	%{ver}_%{rel}
 Release:	3
 License:	GPL
 Group:		X11/Applications/Graphics
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}-3.tar.gz
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{src}.tar.gz
 # Source0-md5:	0bee7d7fc8f352ddbcc6f4720ecc14cc
 ##Patch0:		%{name}-gcc3.patch
 URL:		http://cinepaint.sourceforge.net/
@@ -16,7 +19,6 @@ BuildRequires:	libpng-devel
 BuildRequires:	libtiff-devel
 BuildRequires:	libungif-devel
 BuildRequires:	zlib-devel
-Obsoletes:	filmgimp
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -36,7 +38,6 @@ Summary:	Header files for CinePaint libraries
 Summary(pl):	Pliki nag³ówkowe bibliotek CinePainta
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Obsoletes:	filmgimp-devel
 
 %description devel
 Header files for CinePaint libraries.
@@ -49,7 +50,6 @@ Summary:	Static CinePaint libraries
 Summary(pl):	Statyczne biblioteki CinePaint
 Group:		X11/Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
-Obsoletes:	filmgimp-static
 
 %description static
 Static CinePaint libraries.
@@ -58,7 +58,7 @@ Static CinePaint libraries.
 Statyczne biblioteki CinePainta.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{src}
 ##%%patch0 -p1
 
 %build
@@ -81,33 +81,37 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog NEWS README
+#%doc AUTHORS ChangeLog NEWS README
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
-%attr(755,root,root) %{_libdir}/filmgimp
-%dir %{_datadir}/filmgimp
-%dir %{_datadir}/filmgimp/*
+%dir %{_libdir}/%{name}/%{src}/
+%dir %{_libdir}/%{name}/%{src}/plug-ins/
+%{_libdir}/%{name}/%{src}/plug-ins/*
+%attr(755,root,root) %{_libdir}/%{name}/%{src}/plug-ins/*
+%dir %{_datadir}/%{name}/%{src}/
+%dir %{_datadir}/%{name}/%{src}/*
 # resource directories
-%{_datadir}/filmgimp/*/brushes
-%{_datadir}/filmgimp/*/gradients
-%{_datadir}/filmgimp/*/palettes
-%{_datadir}/filmgimp/*/patterns
-%{_datadir}/filmgimp/*/scripts
+%{_datadir}/%{name}/%{src}/brushes/*
+%{_datadir}/%{name}/%{src}/gradients/*
+%{_datadir}/%{name}/%{src}/palettes/*
+%{_datadir}/%{name}/%{src}/patterns/*
+#%{_datadir}*/scripts
 # default rc(?)
-%{_datadir}/filmgimp/*/gimprc*
-%{_datadir}/filmgimp/*/gtkrc*
-%{_datadir}/filmgimp/*/ps-menurc
+%{_datadir}/%{name}/%{src}/gimprc*
+%{_datadir}/%{name}/%{src}/gtkrc*
+%{_datadir}/%{name}/%{src}/ps-menurc
+%attr(755,root,root) %{_datadir}/%{name}/%{src}/user_install
 # other
-%{_datadir}/filmgimp/*/gimp_*.ppm
-%{_datadir}/filmgimp/*/gimp_tips.txt
-%attr(755,root,root) %{_datadir}/filmgimp/*/user_install
+#%{_datadir}/filmgimp/*/gimp_*.ppm
+#%{_datadir}/filmgimp/*/gimp_tips.txt
+#%attr(755,root,root) %{_datadir}/filmgimp/*/user_install
 %{_mandir}/man1/*.1*
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/lib*.so
 %{_libdir}/lib*.la
-%{_includedir}/filmgimp*
+#%{_includedir}/filmgimp*
 %{_aclocaldir}/*.m4
 
 %files static
