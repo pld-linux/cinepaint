@@ -19,6 +19,7 @@ BuildRequires:	libpng-devel
 BuildRequires:	libtiff-devel
 BuildRequires:	libungif-devel
 BuildRequires:	zlib-devel
+Obsoletes:	filmgimp
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -38,6 +39,7 @@ Summary:	Header files for CinePaint libraries
 Summary(pl):	Pliki nag³ówkowe bibliotek CinePainta
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Obsoletes:	filmgimp-devel
 
 %description devel
 Header files for CinePaint libraries.
@@ -50,6 +52,7 @@ Summary:	Static CinePaint libraries
 Summary(pl):	Statyczne biblioteki CinePaint
 Group:		X11/Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
+Obsoletes:	filmgimp-static
 
 %description static
 Static CinePaint libraries.
