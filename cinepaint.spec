@@ -4,7 +4,7 @@ Summary:	CinePaint - A Motion picture editing tool
 Summary(pl):	CinePaint - Narzêdzie do obróbki filmów
 Name:		cinepaint
 Version:	0.18
-Release:	1
+Release:	2
 License:	GPL
 Group:		X11/Applications/Graphics
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}-1.tar.gz
@@ -18,42 +18,44 @@ BuildRequires:	libpng-devel
 BuildRequires:	libtiff-devel
 BuildRequires:	libungif-devel
 BuildRequires:	zlib-devel
+Obsoletes:	filmgimp
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-Film Gimp is a motion picture editing tool primarily used for painting
-and retouching of movies. Film Gimp is the most successful open source
+CinePaint is a motion picture editing tool primarily used for painting
+and retouching of movies. CinePaint is the most successful open source
 tool in future motion picture work today.
 
 %description -l pl
-Film Gimp jest narzêdziem do obróbki ruchomego obrazu, u¿ywanym
+CinePaint jest narzêdziem do obróbki ruchomego obrazu, u¿ywanym
 g³ównie do rysowania i retuszu filmów. Na dzieñ dzisiejszy jest
 narzêdziem z otwartymi ¼ród³ami, które odnios³o najwiêkszy sukces w
 bran¿y filmowej.
 
 %package devel
-Summary:	Header files for filmgimp libraries
-Summary(pl):	Pliki nag³ówkowe bibliotek filmgimpa
+Summary:	Header files for CinePaint libraries
+Summary(pl):	Pliki nag³ówkowe bibliotek CinePainta
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}
+Obsoletes:	filmgimp-devel
 
 %description devel
-Header files for filmgimp libraries.
+Header files for CinePaint libraries.
 
 %description devel -l pl
-Pliki nag³ówkowe bibliotek filmgimpa.
+Pliki nag³ówkowe bibliotek CinePainta.
 
 %package static
-Summary:	Static filmgimp libraries
-Summary(pl):	Statyczne biblioteki filmgimpa
+Summary:	Static CinePaint libraries
+Summary(pl):	Statyczne biblioteki CinePaint
 Group:		X11/Development/Libraries
 Requires:	%{name}-devel = %{version}
 
 %description static
-Static filmgimp libraries.
+Static CinePaint libraries.
 
 %description static -l pl
-Statyczne biblioteki filmgimpa.
+Statyczne biblioteki CinePainta.
 
 %prep
 %setup -q
