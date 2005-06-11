@@ -5,7 +5,7 @@ Summary:	CinePaint - a motion picture editing tool
 Summary(pl):	CinePaint - narzêdzie do obróbki filmów
 Name:		cinepaint
 Version:	%{ver}_%{rel}
-Release:	5
+Release:	6
 License:	GPL
 Group:		X11/Applications/Graphics
 Source0:	http://dl.sourceforge.net/cinepaint/%{name}-%{src}.tar.gz
@@ -88,6 +88,7 @@ rm -rf $RPM_BUILD_ROOT
 #%doc AUTHORS ChangeLog NEWS README
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/lib*.so.*.*
+%dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/%{src}
 %dir %{_libdir}/%{name}/%{src}/plug-ins
 %attr(755,root,root) %{_libdir}/%{name}/%{src}/plug-ins/*
