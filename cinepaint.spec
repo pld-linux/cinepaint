@@ -1,24 +1,26 @@
-%define		rel	3
-%define		ver	0.18
-%define		src	%{ver}-%{rel}
+%define		subrel	1
+%define		rel	1
+%define		ver	0.19
+%define		src	%{ver}-%{rel}-%{subrel}
 Summary:	CinePaint - a motion picture editing tool
 Summary(pl):	CinePaint - narzêdzie do obróbki filmów
 Name:		cinepaint
 Version:	%{ver}_%{rel}
-Release:	6
+Release:	0.1
 License:	GPL
 Group:		X11/Applications/Graphics
 Source0:	http://dl.sourceforge.net/cinepaint/%{name}-%{src}.tar.gz
-# Source0-md5:	0bee7d7fc8f352ddbcc6f4720ecc14cc
+# Source0-md5:	bfd8c21724631d157097927cf3020277
 ##Patch0:		%{name}-gcc3.patch
 URL:		http://cinepaint.sourceforge.net/
 BuildRequires:	automake
-BuildRequires:	gtk+-devel >= 1.2.8
+BuildRequires:	gtk+-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
 BuildRequires:	libtiff-devel
 BuildRequires:	libungif-devel
 BuildRequires:	zlib-devel
+BuildRequires:	OpenEXR-devel
 Obsoletes:	filmgimp
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -61,7 +63,7 @@ Static CinePaint libraries.
 Statyczne biblioteki CinePainta.
 
 %prep
-%setup -q -n %{name}-%{src}
+%setup -q -n %{name}-%{ver}-%{rel}
 ##%%patch0 -p1
 
 %build
