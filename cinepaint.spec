@@ -14,15 +14,15 @@ Source0:	http://dl.sourceforge.net/cinepaint/%{name}-%{fsrc}.tar.gz
 # Source0-md5:	bfd8c21724631d157097927cf3020277
 ##Patch0:		%{name}-gcc3.patch
 URL:		http://cinepaint.sourceforge.net/
+BuildRequires:	OpenEXR-devel
 BuildRequires:	automake
-BuildRequires:	lcms-devel
+BuildRequires:	giflib-devel
 BuildRequires:	gtk+-devel
+BuildRequires:	lcms-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
 BuildRequires:	libtiff-devel
-BuildRequires:	libungif-devel
 BuildRequires:	zlib-devel
-BuildRequires:	OpenEXR-devel
 Obsoletes:	filmgimp
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
