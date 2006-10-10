@@ -1,21 +1,29 @@
+#
+# TODO:
+#      - Correct building with --with print
+#
+# Conditional build:
+%bcond_with   print	# build with libgutenprintui
+
 %define		subrel	1
 %define		rel	1
-%define		ver	0.19
+%define		ver	0.21
 %define		src	%{ver}-%{rel}
 %define		fsrc	%{ver}-%{rel}-%{subrel}
 Summary:	CinePaint - a motion picture editing tool
 Summary(pl):	CinePaint - narzêdzie do obróbki filmów
 Name:		cinepaint
 Version:	%{ver}_%{rel}
-Release:	0.3
+Release:	0.1
 License:	GPL
 Group:		X11/Applications/Graphics
-Source0:	http://dl.sourceforge.net/cinepaint/%{name}-%{fsrc}.tar.gz
-# Source0-md5:	bfd8c21724631d157097927cf3020277
-##Patch0:		%{name}-gcc3.patch
-URL:		http://cinepaint.sourceforge.net/
+Source0:	http://dl.sourceforge.net/cinepaint/%{name}-%{src}.tar.gz
+# Source0-md5:	d10b7e8c64209d32f665785f7c63da6e
+%{?with_print:Patch0:		%{name}-gutenprintui.patch}
+URL:		http://www.cinepaint.org/
 BuildRequires:	OpenEXR-devel
 BuildRequires:	automake
+BuildRequires:	fltk-devel
 BuildRequires:	giflib-devel
 BuildRequires:	gtk+-devel
 BuildRequires:	lcms-devel
@@ -23,6 +31,7 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
 BuildRequires:	libtiff-devel
 BuildRequires:	zlib-devel
+%{?with_print:BuildRequires:     libgutenprintui-devel}
 Obsoletes:	filmgimp
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -66,11 +75,12 @@ Statyczne biblioteki CinePainta.
 
 %prep
 %setup -q -n %{name}-%{src}
-##%%patch0 -p1
+%{?with_print:%patch0 -p1}
 
 %build
 cp -f /usr/share/automake/config.sub .
-%configure
+%configure \
+	   %{!?with_print:--disable-print}
 
 %{__make}
 
@@ -81,13 +91,15 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT \
 	m4datadir=%{_aclocaldir}
 
+%find_lang cinepaint --all-name
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
-%files
+%files -f %{name}.lang
 %defattr(644,root,root,755)
 #%doc AUTHORS ChangeLog NEWS README
 %attr(755,root,root) %{_bindir}/*
@@ -103,24 +115,25 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/%{src}/gradients
 %{_datadir}/%{name}/%{src}/palettes
 %{_datadir}/%{name}/%{src}/patterns
-#%{_datadir}*/scripts
+%{_datadir}/%{name}/%{src}/curves
 # default rc(?)
 %{_datadir}/%{name}/%{src}/gimprc*
 %{_datadir}/%{name}/%{src}/gtkrc*
 %{_datadir}/%{name}/%{src}/ps-menurc
 %attr(755,root,root) %{_datadir}/%{name}/%{src}/user_install
 # other
-#%{_datadir}/filmgimp/*/gimp_*.ppm
-#%{_datadir}/filmgimp/*/gimp_tips.txt
-#%attr(755,root,root) %{_datadir}/filmgimp/*/user_install
 %{_mandir}/man1/*.1*
+%{_desktopdir}/cinepaint.desktop
+%{_pixmapsdir}/cinepaint.png
+%{_datadir}/%{name}/%{src}/*.ppm
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/lib*.so
 %{_libdir}/lib*.la
-#%{_includedir}/filmgimp*
+%{_includedir}/cinepaint/*
 %{_aclocaldir}/*.m4
+%{_pkgconfigdir}/cinepaint-gtk.pc
 
 %files static
 %defattr(644,root,root,755)
