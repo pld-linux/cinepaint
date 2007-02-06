@@ -6,7 +6,7 @@
 %bcond_with   print	# build with libgutenprintui
 
 %define		subrel	1
-%define		rel	1
+%define		rel	2
 %define		ver	0.21
 %define		src	%{ver}-%{rel}
 %define		fsrc	%{ver}-%{rel}-%{subrel}
@@ -18,7 +18,7 @@ Release:	0.1
 License:	GPL
 Group:		X11/Applications/Graphics
 Source0:	http://dl.sourceforge.net/cinepaint/%{name}-%{src}.tar.gz
-# Source0-md5:	d10b7e8c64209d32f665785f7c63da6e
+# Source0-md5:	2cc81ac4ea0f32b4af823e94fa2c7380
 %{?with_print:Patch0:		%{name}-gutenprintui.patch}
 URL:		http://www.cinepaint.org/
 BuildRequires:	OpenEXR-devel
