@@ -11,7 +11,7 @@
 %define		src	%{ver}-%{rel}
 %define		fsrc	%{ver}-%{rel}-%{subrel}
 Summary:	CinePaint - a motion picture editing tool
-Summary(pl.UTF-8):   CinePaint - narzędzie do obróbki filmów
+Summary(pl.UTF-8):	CinePaint - narzędzie do obróbki filmów
 Name:		cinepaint
 Version:	%{ver}_%{rel}
 Release:	0.1
@@ -49,7 +49,7 @@ branży filmowej. Wcześniej było znane pod nazwą FilmGimp.
 
 %package devel
 Summary:	Header files for CinePaint libraries
-Summary(pl.UTF-8):   Pliki nagłówkowe bibliotek CinePainta
+Summary(pl.UTF-8):	Pliki nagłówkowe bibliotek CinePainta
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Obsoletes:	filmgimp-devel
@@ -62,7 +62,7 @@ Pliki nagłówkowe bibliotek CinePainta.
 
 %package static
 Summary:	Static CinePaint libraries
-Summary(pl.UTF-8):   Statyczne biblioteki CinePaint
+Summary(pl.UTF-8):	Statyczne biblioteki CinePaint
 Group:		X11/Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 Obsoletes:	filmgimp-static
