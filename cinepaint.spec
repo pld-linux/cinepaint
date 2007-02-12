@@ -11,7 +11,7 @@
 %define		src	%{ver}-%{rel}
 %define		fsrc	%{ver}-%{rel}-%{subrel}
 Summary:	CinePaint - a motion picture editing tool
-Summary(pl):	CinePaint - narzêdzie do obróbki filmów
+Summary(pl.UTF-8):   CinePaint - narzÄ™dzie do obrÃ³bki filmÃ³w
 Name:		cinepaint
 Version:	%{ver}_%{rel}
 Release:	0.1
@@ -41,15 +41,15 @@ and retouching of movies. CinePaint is the most successful open source
 tool in future motion picture work today. It was formerly known as
 FilmGimp.
 
-%description -l pl
-CinePaint jest narzêdziem do obróbki ruchomego obrazu, u¿ywanym
-g³ównie do rysowania i retuszu filmów. Na dzieñ dzisiejszy jest
-narzêdziem z otwartymi ¼ród³ami, które odnios³o najwiêkszy sukces w
-bran¿y filmowej. Wcze¶niej by³o znane pod nazw± FilmGimp.
+%description -l pl.UTF-8
+CinePaint jest narzÄ™dziem do obrÃ³bki ruchomego obrazu, uÅ¼ywanym
+gÅ‚Ã³wnie do rysowania i retuszu filmÃ³w. Na dzieÅ„ dzisiejszy jest
+narzÄ™dziem z otwartymi ÅºrÃ³dÅ‚ami, ktÃ³re odniosÅ‚o najwiÄ™kszy sukces w
+branÅ¼y filmowej. WczeÅ›niej byÅ‚o znane pod nazwÄ… FilmGimp.
 
 %package devel
 Summary:	Header files for CinePaint libraries
-Summary(pl):	Pliki nag³ówkowe bibliotek CinePainta
+Summary(pl.UTF-8):   Pliki nagÅ‚Ã³wkowe bibliotek CinePainta
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Obsoletes:	filmgimp-devel
@@ -57,12 +57,12 @@ Obsoletes:	filmgimp-devel
 %description devel
 Header files for CinePaint libraries.
 
-%description devel -l pl
-Pliki nag³ówkowe bibliotek CinePainta.
+%description devel -l pl.UTF-8
+Pliki nagÅ‚Ã³wkowe bibliotek CinePainta.
 
 %package static
 Summary:	Static CinePaint libraries
-Summary(pl):	Statyczne biblioteki CinePaint
+Summary(pl.UTF-8):   Statyczne biblioteki CinePaint
 Group:		X11/Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 Obsoletes:	filmgimp-static
@@ -70,7 +70,7 @@ Obsoletes:	filmgimp-static
 %description static
 Static CinePaint libraries.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Statyczne biblioteki CinePainta.
 
 %prep
