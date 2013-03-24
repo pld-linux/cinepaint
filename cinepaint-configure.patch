@@ -1,0 +1,11 @@
+--- cinepaint/configure.in.orig	2013-03-22 22:35:07.518234103 +0100
++++ cinepaint/configure.in	2013-03-22 22:56:46.378179589 +0100
+@@ -514,7 +514,7 @@
+     fi
+     if test "x$FLTK_CONFIG" != "xno"; then
+       FLTK_CONFIG="$FLTK_CONFIG"
+-        FLTK_LDFLAGS="`$FLTK_CONFIG --use-images --ldflags | sed \"$STRIPOPT\"`"
++        FLTK_LDFLAGS="`$FLTK_CONFIG --use-images --ldflags`"
+         FLTK_LIBS_PURE="`echo $FLTK_LDFLAGS | sed  's/-O.// ; s/-isysroot /-L/ ; s/-arch ppc// ; s/-arch i386//'`"
+         FLTK_LIBS="\$(top_builddir)/lib/fl_i18n/libcinepaint_fl_i18n.la $FLTK_LIBS_PURE"
+         FLTK_CFLAGS=`$FLTK_CONFIG --cxxflags | sed  's/-O.// ; s/-isysroot /-L/ ; s/-arch ppc// ; s/-arch i386//'`

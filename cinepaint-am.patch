@@ -1,0 +1,39 @@
+--- cinepaint/configure.in.orig	2012-04-07 03:39:53.000000000 +0200
++++ cinepaint/configure.in	2013-03-22 22:29:57.734913770 +0100
+@@ -3,7 +3,7 @@
+ prefix=/usr/bin
+ 
+ AC_INIT(gimprc.in)
+-AM_CONFIG_HEADER(lib/config.h)
++AC_CONFIG_HEADERS(lib/config.h)
+ 
+ dnl Initialize automake stuff
+ dnl $Format: "MAJOR_VERSION=$ReleaseMajorVersion$" $
+@@ -22,7 +22,6 @@
+ AM_SANITY_CHECK
+ 
+ AC_PROG_CC
+-AM_PROG_CC_STDC
+ AC_PROG_CXX
+ AC_PROG_CPP
+ AC_PROG_INSTALL
+--- cinepaint/acinclude.m4.orig	2008-03-02 07:33:59.000000000 +0100
++++ cinepaint/acinclude.m4	2013-03-22 22:34:51.258234783 +0100
+@@ -5,7 +5,7 @@
+ 
+ dnl AM_PROG_LEX
+ dnl Look for flex, lex or missing, then run AC_PROG_LEX and AC_DECL_YYTEXT
+-AC_DEFUN(AM_PROG_LEX,
++AC_DEFUN([AM_PROG_LEX],
+ [missing_dir=ifelse([$1],,`cd $ac_aux_dir && pwd`,$1)
+ AC_CHECK_PROGS(LEX, flex lex, "$missing_dir/missing flex")
+ AC_PROG_LEX
+@@ -26,7 +26,7 @@
+ dnl OpenEXR
+ dnl
+ 
+-AC_DEFUN(AM_PATH_OPENEXR,
++AC_DEFUN([AM_PATH_OPENEXR],
+ [dnl 
+ dnl Get the cflags and libraries
+ dnl

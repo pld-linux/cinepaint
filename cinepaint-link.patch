@@ -1,0 +1,12 @@
+--- cinepaint/lib/Makefile.am.orig	2007-10-25 12:17:36.000000000 +0200
++++ cinepaint/lib/Makefile.am	2013-03-23 21:27:13.098112559 +0100
+@@ -18,7 +18,8 @@
+ 
+ libcinepaint_la_LIBADD = \
+ 	./wire/libwire.la \
+-	$(top_builddir)/libhalf/libcinepaintHalf.la
++	$(top_builddir)/libhalf/libcinepaintHalf.la \
++	$(GTK_LIBS) -lm
+ 
+ libcinepaint_la_SOURCES = \
+ 	chain.xpm \
