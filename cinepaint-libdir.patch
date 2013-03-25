@@ -1,0 +1,10 @@
+--- cinepaint/cinepaint-gtk.pc.in.orig	2007-03-22 18:39:48.000000000 +0100
++++ cinepaint/cinepaint-gtk.pc.in	2013-03-25 19:43:20.851122374 +0100
+@@ -1,6 +1,6 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-libdir=${exec_prefix}/lib
++libdir=@libdir@
+ includedir=@includedir@/cinepaint
+ datarootdir=@datarootdir@
+ programdotdir=@programdotdir@

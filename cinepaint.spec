@@ -1,10 +1,7 @@
 #
-# TODO:
-#      - Correct building with --with print
-#
 # Conditional build:
-%bcond_with	print	# build with libgutenprintui
-%bcond_with	gtk1	# GTK+ 1.x instead of 2.x
+%bcond_without	gutenprint	# gutenprint-based print plugin
+%bcond_with	gtk1		# GTK+ 1.x instead of 2.x
 
 Summary:	CinePaint - a motion picture editing tool
 Summary(pl.UTF-8):	CinePaint - narzędzie do obróbki filmów
@@ -20,6 +17,7 @@ Patch1:		%{name}-configure.patch
 Patch2:		%{name}-libpng.patch
 Patch3:		%{name}-link.patch
 Patch4:		%{name}-paths.patch
+Patch5:		%{name}-libdir.patch
 URL:		http://www.cinepaint.org/
 BuildRequires:	OpenEXR-devel >= 1.0.0
 BuildRequires:	autoconf
@@ -40,15 +38,18 @@ BuildRequires:	xorg-lib-libSM-devel
 BuildRequires:	xorg-lib-libXmu-devel
 BuildRequires:	xorg-lib-libXt-devel
 BuildRequires:	zlib-devel
-%{?with_print:BuildRequires:     libgutenprintui-devel >= 5.0.0}
+%{?with_gutenprint:BuildRequires:	libgutenprintui-devel >= 5.0.0}
 %if %{with gtk1}
 BuildRequires:	glib-devel
 BuildRequires:	gtk+-devel >= 1.2.8
+Requires:	gtk+ >= 1.2.8
 %else
 BuildRequires:	gtk+2-devel >= 2.0.0
 %endif
+Requires:	OpenEXR >= 1.0.0
 # FreeSans.ttf
 Requires:	fonts-TTF-freefont
+Requires:	lcms >= 1.16
 Obsoletes:	filmgimp
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -71,6 +72,11 @@ Summary:	Header files for CinePaint libraries
 Summary(pl.UTF-8):	Pliki nagłówkowe bibliotek CinePainta
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+%if %{with gtk1}
+Requires:	gtk+-devel >= 1.2.8
+%else
+Requires:	gtk+2-devel >= 2.0.0
+%endif
 Obsoletes:	filmgimp-devel
 
 %description devel
@@ -92,6 +98,19 @@ Static CinePaint libraries.
 %description static -l pl.UTF-8
 Statyczne biblioteki CinePainta.
 
+%package plugin-print
+Summary:	Print plug-in for CinePaint
+Summary(pl.UTF-8):	Wtyczka do drukowania dla CinePainta
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	libgutenprintui >= 5.0.0
+
+%description plugin-print
+Print plug-in for CinePaint.
+
+%description plugin-print -l pl.UTF-8
+Wtyczka do drukowania dla CinePainta.
+
 %prep
 %setup -q -n %{name}
 %patch0 -p1
@@ -99,6 +118,7 @@ Statyczne biblioteki CinePainta.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 # dead symlinks
 %{__rm} config.guess config.sub py-compile
@@ -109,7 +129,7 @@ Statyczne biblioteki CinePainta.
 %{__autoconf}
 %{__automake}
 %configure \
-	%{!?with_print:--disable-print}
+	%{!?with_gutenprint:--disable-print}
 
 %{__make}
 
@@ -153,7 +173,58 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/%{name}/%{abiver}/extra/dcraw
 %attr(755,root,root) %{_libdir}/%{name}/%{abiver}/extra/jhead
 %dir %{_libdir}/%{name}/%{abiver}/plug-ins
-%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/*
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/blur
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/bmp
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/bracketing_to_hdr
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/cineon
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/clothify.py
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/collect
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/compose
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/dbbrowser
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/decompose
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/dicom
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/edge
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/fits
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/foggify.py
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/gauss_rle
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/gbr
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/gifload
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/gimpcons.py
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/gtkcons.py
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/hdr
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/icc_examin_cp
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/iff
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/iol
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/jpeg
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/mblur
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/median
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/minimum
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/noisify
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/openexr
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/pdbbrowse.py
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/pdf
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/pic
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/png
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/pnm
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/psd
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/psd_save
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/rawphoto
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/retinex
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/rotate
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/screenshot
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/script-fu
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/sgi
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/shadow_bevel.py
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/sharpen
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/snoise
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/sobel
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/sphere.py
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/spread
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/tga
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/tiff
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/unsharp
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/whirlpinch.py
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/xwd
 # resource directories
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/%{abiver}
@@ -203,3 +274,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libcinepaint.a
 %{_libdir}/libcinepaintHalf.a
 %{_libdir}/libcinepaint_fl_i18n.a
+
+%files plugin-print
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/%{name}/%{abiver}/plug-ins/print
