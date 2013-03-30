@@ -25,6 +25,12 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	flex
 BuildRequires:	fltk-devel
+%if %{with gtk1}
+BuildRequires:	glib-devel
+BuildRequires:	gtk+-devel >= 1.2.8
+%else
+BuildRequires:	gtk+2-devel >= 2.0.0
+%endif
 BuildRequires:	lcms-devel >= 1.16
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel >= 1.0.0
@@ -40,13 +46,7 @@ BuildRequires:	xorg-lib-libXmu-devel
 BuildRequires:	xorg-lib-libXt-devel
 BuildRequires:	zlib-devel
 %{?with_gutenprint:BuildRequires:	libgutenprintui-devel >= 5.0.0}
-%if %{with gtk1}
-BuildRequires:	glib-devel
-BuildRequires:	gtk+-devel >= 1.2.8
-Requires:	gtk+ >= 1.2.8
-%else
-BuildRequires:	gtk+2-devel >= 2.0.0
-%endif
+Requires:	%{name}-libs = %{version}-%{release}
 Requires:	OpenEXR >= 1.0.0
 # FreeSans.ttf
 Requires:	fonts-TTF-freefont
@@ -68,11 +68,26 @@ głównie do rysowania i retuszu filmów. Na dzień dzisiejszy jest
 narzędziem z otwartymi źródłami, które odniosło największy sukces w
 branży filmowej. Wcześniej było znane pod nazwą FilmGimp.
 
+%package libs
+Summary:	CinePaint shared libraries
+Summary(pl.UTF-8):	Biblioteki współdzielone CinePainta
+Group:		Libraries
+%if %{with gtk1}
+Requires:	gtk+ >= 1.2.8
+%endif
+Conflicts:	cinepaint < 1.3
+
+%description libs
+CinePaint shared libraries.
+
+%description libs -l pl.UTF-8
+Biblioteki współdzielone CinePainta.
+
 %package devel
 Summary:	Header files for CinePaint libraries
 Summary(pl.UTF-8):	Pliki nagłówkowe bibliotek CinePainta
 Group:		X11/Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
 %if %{with gtk1}
 Requires:	gtk+-devel >= 1.2.8
 %else
@@ -154,8 +169,8 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %defattr(644,root,root,755)
@@ -163,12 +178,6 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS BUGS COPYING ChangeLog NEWS README TODO
 %attr(755,root,root) %{_bindir}/cinepaint
 %attr(755,root,root) %{_bindir}/cinepaint-remote
-%attr(755,root,root) %{_libdir}/libcinepaint.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcinepaint.so.1
-%attr(755,root,root) %{_libdir}/libcinepaintHalf.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcinepaintHalf.so.1
-%attr(755,root,root) %{_libdir}/libcinepaint_fl_i18n.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcinepaint_fl_i18n.so.1
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/%{abiver}
 %dir %{_libdir}/%{name}/%{abiver}/extra
@@ -256,6 +265,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/cinepaint.1*
 %{_desktopdir}/cinepaint.desktop
 %{_pixmapsdir}/cinepaint.png
+
+%files libs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libcinepaint.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcinepaint.so.1
+%attr(755,root,root) %{_libdir}/libcinepaintHalf.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcinepaintHalf.so.1
+%attr(755,root,root) %{_libdir}/libcinepaint_fl_i18n.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcinepaint_fl_i18n.so.1
 
 %files devel
 %defattr(644,root,root,755)
