@@ -1,0 +1,107 @@
+--- cinepaint/plug-ins/icc_examin/icc_examin/configure.sh.orig	2008-10-24 21:05:23.000000000 +0200
++++ cinepaint/plug-ins/icc_examin/icc_examin/configure.sh	2013-03-29 21:35:26.036257910 +0100
+@@ -171,7 +171,7 @@
+ #   test -n "$ECHO" && $ECHO "Oyranos `pkg-config --modversion oyranos`           detected"
+     echo "#define HAVE_OY 1" >> $CONF_H
+     echo "OY = 1" >> $CONF
+-    echo "OYRANOS_H = `oyranos-config --cflags`" >> $CONF
++    echo "OYRANOS_H = `oyranos-config --cflags` `oyranos-config --cflags`/alpha" >> $CONF
+ #   echo "OYRANOS_H = `pkg-config --cflags oyranos_monitor`" >> $CONF
+     if [ -f /usr/X11R6/include/X11/extensions/xf86vmode.h ]; then
+         pkg-config --exists oyranos_monitor
+--- cinepaint/plug-ins/icc_examin/icc_examin/icc_oyranos_extern.h.orig	2008-08-22 20:11:18.000000000 +0200
++++ cinepaint/plug-ins/icc_examin/icc_examin/icc_oyranos_extern.h	2013-03-29 21:50:48.619572400 +0100
+@@ -39,7 +39,7 @@
+ #endif
+ #if OYRANOS_VERSION > 107
+ # include <oyranos/oyranos_icc.h>
+-# include <oyranos/oyranos_alpha.h>
++# include <oyranos/alpha/oyranos_alpha.h>
+ #endif
+ #endif
+ #include "icc_icc.h"
+--- cinepaint/plug-ins/icc_examin/icc_examin/icc_oyranos.cpp.orig	2008-10-24 22:15:51.000000000 +0200
++++ cinepaint/plug-ins/icc_examin/icc_examin/icc_oyranos.cpp	2013-03-29 21:57:46.776229932 +0100
+@@ -161,7 +161,7 @@
+   Speicher *v_block = &lab_;
+   if( !v_block->size() )
+   { DBG_PROG_V( v_block->size() )
+-    char* profil_name = oyGetDefaultProfileName( oyranos::oyASSUMED_LAB, myAllocFunc );
++    char* profil_name = oyGetDefaultProfileName( oyASSUMED_LAB, myAllocFunc );
+     if(profil_name)
+       DBG_PROG_V( (int*)profil_name << profil_name );
+     if( profil_name &&
+@@ -472,7 +472,7 @@
+   Speicher *v_block = &rgb_;
+   if( !v_block->size() )
+   { DBG_PROG_V( v_block->size() )
+-    const char* profil_name = oyGetDefaultProfileName( oyranos::oyASSUMED_RGB, myAllocFunc );
++    const char* profil_name = oyGetDefaultProfileName( oyASSUMED_RGB, myAllocFunc );
+     if(profil_name)
+       DBG_PROG_V( (intptr_t)profil_name << profil_name );
+     if( profil_name &&
+@@ -523,7 +523,7 @@
+   Speicher *v_block = &cmyk_;
+   if( !v_block->size() )
+   { DBG_PROG_V( v_block->size() )
+-    char* profil_name = oyGetDefaultProfileName( oyranos::oyASSUMED_CMYK, myAllocFunc );
++    char* profil_name = oyGetDefaultProfileName( oyASSUMED_CMYK, myAllocFunc );
+     if(profil_name) {DBG_PROG_V( profil_name );
+     } else {         DBG_PROG_V( (intptr_t)profil_name );}
+ 
+@@ -565,7 +565,7 @@
+   Speicher *v_block = &proof_;
+   char* profil_name = NULL;
+ 
+-  profil_name = oyGetDefaultProfileName( oyranos::oyPROFILE_PROOF, myAllocFunc);
++  profil_name = oyGetDefaultProfileName( oyPROFILE_PROOF, myAllocFunc);
+ 
+   if( !v_block->size() )
+   { DBG_PROG_V( v_block->size() )
+@@ -717,9 +717,11 @@
+ 
+   int screen = oyGetScreenFromPosition( display_name, x,y );
+   char *new_display_name = changeScreenName_( display_name, screen );
++  char *dummy_geom, *dummy_port;
++  oyBlob_s *dummy_edit;
+ //int fehler =
+                oyGetMonitorInfo( new_display_name,
+-                                 &manufacturer, &model, &serial,
++                                 &manufacturer, &model, &serial, &dummy_geom, &dummy_port, &dummy_edit,
+                                  myAllocFunc );
+ 
+   if( manufacturer && strlen( manufacturer ) )
+--- cinepaint/plug-ins/pdf/pdf.cpp.orig	2008-10-10 07:44:15.000000000 +0200
++++ cinepaint/plug-ins/pdf/pdf.cpp	2013-03-29 22:08:45.282882724 +0100
+@@ -47,10 +47,10 @@
+ #include "lib/wire/libtile.h"
+ #include "plugin_pdb.h"
+ #include "libgimp/stdplugins-intl.h"
++}
+ #ifdef HAVE_OY
+ #include <oyranos/oyranos.h>
+ #endif
+-}
+ 
+ #define WARN_S(text) cout <<__FILE__<<":"<<__LINE__<<" "<< text << endl;
+ 
+@@ -377,7 +377,6 @@
+     // set a default profile for cmyk
+ #ifdef OYRANOS_H
+ # if OYRANOS_API > 12
+-    using namespace oyranos;
+ 
+     if( vals.colourspace == PDF_CMYK )
+       profile_name = oyGetDefaultProfileName (oyEDITING_CMYK, myAllocFunc);
+--- cinepaint/app/cms.c.orig	2009-01-01 00:14:53.000000000 +0100
++++ cinepaint/app/cms.c	2013-03-29 22:37:04.432847455 +0100
+@@ -45,7 +45,8 @@
+ #include <arpa/inet.h>  /* ntohl */
+ #include <oyranos/oyranos_monitor.h>
+ #else
+-#include <oyranos/oyranos_alpha.h>
++#include <oyranos/oyProfiles_s.h>
++#include <oyranos/alpha/oyranos_alpha.h>
+ #endif
+ #endif
+ 

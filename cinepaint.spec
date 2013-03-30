@@ -7,7 +7,7 @@ Summary:	CinePaint - a motion picture editing tool
 Summary(pl.UTF-8):	CinePaint - narzędzie do obróbki filmów
 Name:		cinepaint
 Version:	1.3
-Release:	0.1
+Release:	1
 License:	GPL v2+ (with LGPL v2.1+ and MIT parts)
 Group:		X11/Applications/Graphics
 Source0:	http://downloads.sourceforge.net/cinepaint/%{name}-%{version}.tgz
@@ -18,6 +18,7 @@ Patch2:		%{name}-libpng.patch
 Patch3:		%{name}-link.patch
 Patch4:		%{name}-paths.patch
 Patch5:		%{name}-libdir.patch
+Patch6:		%{name}-oyranos.patch
 URL:		http://www.cinepaint.org/
 BuildRequires:	OpenEXR-devel >= 1.0.0
 BuildRequires:	autoconf
@@ -29,7 +30,7 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel >= 1.0.0
 BuildRequires:	libtiff-devel
 BuildRequires:	libtool
-#BuildRequires:	oyranos-devel
+BuildRequires:	oyranos-devel
 BuildRequires:	pkgconfig
 BuildRequires:	python-devel
 BuildRequires:	rpmbuild(macros) >= 1.219
@@ -119,6 +120,7 @@ Wtyczka do drukowania dla CinePainta.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 # dead symlinks
 %{__rm} config.guess config.sub py-compile
