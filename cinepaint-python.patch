@@ -1,0 +1,11 @@
+--- cinepaint/configure.in.orig	2013-03-31 10:45:39.959929556 +0200
++++ cinepaint/configure.in	2013-03-31 11:13:42.014092614 +0200
+@@ -611,7 +611,7 @@
+       PYLIB="-L$PYEPREFIX"
+       PYLINK="-framework Python"
+     fi
+-    if test -z "$PYLIB"; then
++    if test -z "$PYINCLUDE"; then
+         AC_MSG_RESULT(Not found)
+     else
+         AC_MSG_RESULT($PYLIB)

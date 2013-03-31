@@ -1,0 +1,10 @@
+--- cinepaint/plug-ins/icc_examin/icc_examin/icc_modell_beobachter.cpp.orig	2007-11-09 16:10:45.000000000 +0100
++++ cinepaint/plug-ins/icc_examin/icc_examin/icc_modell_beobachter.cpp	2013-03-30 21:00:17.235837818 +0100
+@@ -30,6 +30,7 @@
+ 
+ #include "icc_utils.h"
+ 
++#include <stdint.h>
+ #include <list>
+ #include <string>
+ 

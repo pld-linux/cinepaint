@@ -19,12 +19,16 @@ Patch3:		%{name}-link.patch
 Patch4:		%{name}-paths.patch
 Patch5:		%{name}-libdir.patch
 Patch6:		%{name}-oyranos.patch
+Patch7:		%{name}-format.patch
+Patch8:		%{name}-include.patch
+Patch9:		%{name}-python.patch
 URL:		http://www.cinepaint.org/
 BuildRequires:	OpenEXR-devel >= 1.0.0
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	flex
 BuildRequires:	fltk-devel
+BuildRequires:	fltk-gl-devel
 %if %{with gtk1}
 BuildRequires:	glib-devel
 BuildRequires:	gtk+-devel >= 1.2.8
@@ -136,6 +140,9 @@ Wtyczka do drukowania dla CinePainta.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
 
 # dead symlinks
 %{__rm} config.guess config.sub py-compile
