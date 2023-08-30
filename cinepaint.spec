@@ -22,13 +22,14 @@ Patch6:		%{name}-oyranos.patch
 Patch7:		%{name}-format.patch
 Patch8:		%{name}-include.patch
 Patch9:		%{name}-python.patch
-URL:		http://www.cinepaint.org/
+URL:		http://cinepaint.org/
 BuildRequires:	OpenEXR-devel >= 1.0.0
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	flex
 BuildRequires:	fltk-devel
 BuildRequires:	fltk-gl-devel
+BuildRequires:	gettext-tools
 %if %{with gtk1}
 BuildRequires:	glib-devel
 BuildRequires:	gtk+-devel >= 1.2.8
@@ -38,6 +39,7 @@ BuildRequires:	gtk+2-devel >= 2.0.0
 BuildRequires:	lcms-devel >= 1.16
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel >= 1.0.0
+BuildRequires:	libstdc++-devel
 BuildRequires:	libtiff-devel
 BuildRequires:	libtool
 BuildRequires:	oyranos-devel
