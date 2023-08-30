@@ -1,7 +1,6 @@
-diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
---- cinepaint1/plug-ins/png/png.c	2006-11-24 21:52:55.000000000 +0100
-+++ cinepaint/plug-ins/png/png.c	2012-02-04 01:51:10.141016081 +0100
-@@ -390,7 +390,16 @@
+--- cinepaint/plug-ins/png/png.c.orig	2006-11-24 21:52:55.000000000 +0100
++++ cinepaint/plug-ins/png/png.c	2023-08-30 18:58:13.093905639 +0200
+@@ -390,7 +390,16 @@ load_image (gchar *filename)	/* I - File
    gchar		*progress;	/* Title for progress display... */
    guchar	alpha[256],	/* Index -> Alpha */
    		*alpha_ptr;	/* Temporary pointer */
@@ -19,7 +18,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
   /*
    * PNG 0.89 and newer have a sane, forwards compatible constructor.
    * Some SGI IRIX users will not have a new enough version though
-@@ -405,7 +414,7 @@
+@@ -405,7 +414,7 @@ load_image (gchar *filename)	/* I - File
    info = (png_infop)calloc(sizeof(png_info), 1);
  #endif /* PNG_LIBPNG_VER > 88 */
  
@@ -28,7 +27,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
    {
      g_message ("%s\nPNG error. File corrupted?", filename);
      return image;
-@@ -442,21 +451,23 @@
+@@ -442,21 +451,23 @@ load_image (gchar *filename)	/* I - File
    */
  
    png_read_info(pp, info);
@@ -58,7 +57,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
      png_set_packing(pp);
    }
  
-@@ -464,8 +475,8 @@
+@@ -464,8 +475,8 @@ load_image (gchar *filename)	/* I - File
    * Expand G+tRNS to GA, RGB+tRNS to RGBA
    */
  
@@ -69,7 +68,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
      png_set_expand(pp);
    }
  
-@@ -482,7 +493,7 @@
+@@ -482,7 +493,7 @@ load_image (gchar *filename)	/* I - File
  
  #if PNG_LIBPNG_VER > 99
    if (png_get_valid(pp, info, PNG_INFO_tRNS) &&
@@ -78,7 +77,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
    {
      png_get_tRNS(pp, info, &alpha_ptr, &num, NULL);
      /* Copy the existing alpha values from the tRNS chunk */
-@@ -505,12 +516,12 @@
+@@ -505,12 +516,12 @@ load_image (gchar *filename)	/* I - File
  
    png_read_update_info(pp, info);
    
@@ -94,7 +93,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
  			  image_type = U16_RGB;
  			  layer_type = U16_RGB_IMAGE;
  			  break;
-@@ -545,10 +556,10 @@
+@@ -545,10 +556,10 @@ load_image (gchar *filename)	/* I - File
    }
    else
    {
@@ -107,7 +106,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
  			  image_type = RGB;
  			  layer_type = RGB_IMAGE;
  			  break;
-@@ -582,7 +593,7 @@
+@@ -582,7 +593,7 @@ load_image (gchar *filename)	/* I - File
  	  };
    }
  
@@ -115,8 +114,8 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
 +  image = gimp_image_new(width, height, image_type);
    if (image == -1)
    {
-     g_message("Can&#x27;t allocate new image\n%s", filename);
-@@ -595,7 +606,7 @@
+     g_message("Can't allocate new image\n%s", filename);
+@@ -595,7 +606,7 @@ load_image (gchar *filename)	/* I - File
    * Create the "background" layer to hold the image...
    */
  
@@ -125,7 +124,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
                           layer_type, 100, NORMAL_MODE);
    gimp_image_add_layer(image, layer, 0);
  
-@@ -627,20 +638,21 @@
+@@ -627,20 +638,21 @@ load_image (gchar *filename)	/* I - File
  
    empty= 0; /* by default assume no full transparent palette entries */
  
@@ -152,7 +151,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
  #endif /* PNG_LIBPNG_VER > 99 */
  
    }
-@@ -659,18 +671,19 @@
+@@ -659,18 +671,19 @@ load_image (gchar *filename)	/* I - File
    */
  
    tile_height = gimp_tile_height ();
@@ -176,7 +175,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
    }
  
    for (pass = 0; pass < num_passes; pass ++)
-@@ -680,11 +693,11 @@
+@@ -680,11 +693,11 @@ load_image (gchar *filename)	/* I - File
  	   */
  
  	  for (begin = 0, end = tile_height;
@@ -191,7 +190,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
  
  		  num = end - begin;
  
-@@ -697,20 +710,21 @@
+@@ -697,20 +710,21 @@ load_image (gchar *filename)	/* I - File
  		  gimp_pixel_rgn_set_rect(&pixel_rgn, pixel, 0, begin,
  				  drawable->width, num);
  
@@ -219,7 +218,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
    }
  #endif
  
-@@ -809,6 +823,15 @@
+@@ -809,6 +823,15 @@ save_image (gchar  *filename,	        /*
    time_t	cutime;         /* Time since epoch */
    struct tm	*gmt;		/* GMT broken down */
  
@@ -235,16 +234,16 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
   /*
    * PNG 0.89 and newer have a sane, forwards compatible constructor.
    * Some SGI IRIX users will not have a new enough version though
-@@ -824,7 +847,7 @@
+@@ -824,7 +847,7 @@ save_image (gchar  *filename,	        /*
    info = (png_infop)calloc(sizeof(png_info), 1);
  #endif /* PNG_LIBPNG_VER > 88 */
  
 -  if (setjmp (pp->jmpbuf))
 +  if (setjmp (png_jmpbuf(pp)))
    {
-     g_message ("%s\nPNG error. Couldn&#x27;t save image", filename);
+     g_message ("%s\nPNG error. Couldn't save image", filename);
      return 0;
-@@ -858,87 +881,75 @@
+@@ -858,87 +881,75 @@ save_image (gchar  *filename,	        /*
    type     = gimp_drawable_type (drawable_ID);
  
   /*
@@ -360,7 +359,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
  	respin_cmap (pp, info, image_ID); /* fix up transparency */
  	break;
      default:
-@@ -950,16 +961,21 @@
+@@ -950,16 +961,21 @@ save_image (gchar  *filename,	        /*
    * Fix bit depths for (possibly) smaller colormap images
    */
    
@@ -389,7 +388,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
    // write icc profile
  #if defined(PNG_iCCP_SUPPORTED)
    if (gimp_image_has_icc_profile (image_ID, ICC_IMAGE_PROFILE)) {
-@@ -970,10 +986,10 @@
+@@ -970,10 +986,10 @@ save_image (gchar  *filename,	        /*
                                                  ICC_IMAGE_PROFILE);
      png_set_iCCP (pp, info,
             gimp_image_get_icc_profile_description (image_ID, ICC_IMAGE_PROFILE),
@@ -402,7 +401,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
    }
  #endif
  
-@@ -1039,13 +1055,13 @@
+@@ -1039,13 +1055,13 @@ save_image (gchar  *filename,	        /*
    * Convert unpacked pixels to packed if necessary
    */
  
@@ -418,7 +417,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
  	  png_set_swap(pp);
  #endif
    
-@@ -1063,6 +1079,7 @@
+@@ -1063,6 +1079,7 @@ save_image (gchar  *filename,	        /*
  
    gimp_pixel_rgn_init(&pixel_rgn, drawable, 0, 0, drawable->width,
                        drawable->height, FALSE, FALSE);
@@ -426,7 +425,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
  
    for (pass = 0; pass < num_passes; pass ++)
    {
-@@ -1077,7 +1094,7 @@
+@@ -1077,7 +1094,7 @@ save_image (gchar  *filename,	        /*
  	num = end - begin;
  	
  	gimp_pixel_rgn_get_rect (&pixel_rgn, pixel, 0, begin, drawable->width, num);
@@ -435,7 +434,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
            for (i = 0; i < num; ++i) {
  	    fixed= pixels[i];
              for (k = 0; k < drawable->width; ++k) {
-@@ -1085,7 +1102,7 @@
+@@ -1085,7 +1102,7 @@ save_image (gchar  *filename,	        /*
              }
            }
         /* Forgot this case before, what if there are too many colors? */
@@ -444,7 +443,7 @@ diff -Naur cinepaint1/plug-ins/png/png.c cinepaint/plug-ins/png/png.c
            for (i = 0; i < num; ++i) {
  	    fixed= pixels[i];
              for (k = 0; k < drawable->width; ++k) {
-@@ -1097,7 +1114,7 @@
+@@ -1097,7 +1114,7 @@ save_image (gchar  *filename,	        /*
  	png_write_rows (pp, pixels, num);
  	
  	gimp_progress_update (((double)pass + (double)end /
