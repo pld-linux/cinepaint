@@ -55,7 +55,7 @@ Requires:	OpenEXR >= 1.0.0
 # FreeSans.ttf
 Requires:	fonts-TTF-freefont
 Requires:	lcms >= 1.16
-Obsoletes:	filmgimp
+Obsoletes:	filmgimp < 1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		abiver	1.3.0
@@ -97,7 +97,7 @@ Requires:	gtk+-devel >= 1.2.8
 %else
 Requires:	gtk+2-devel >= 2.0.0
 %endif
-Obsoletes:	filmgimp-devel
+Obsoletes:	filmgimp-devel < 1
 
 %description devel
 Header files for CinePaint libraries.
@@ -110,7 +110,7 @@ Summary:	Static CinePaint libraries
 Summary(pl.UTF-8):	Statyczne biblioteki CinePaint
 Group:		X11/Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
-Obsoletes:	filmgimp-static
+Obsoletes:	filmgimp-static < 1
 
 %description static
 Static CinePaint libraries.
