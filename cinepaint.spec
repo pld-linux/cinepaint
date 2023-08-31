@@ -22,6 +22,8 @@ Patch6:		%{name}-oyranos.patch
 Patch7:		%{name}-format.patch
 Patch8:		%{name}-include.patch
 Patch9:		%{name}-python.patch
+Patch10:	%{name}-extern.patch
+Patch11:	%{name}-no-common.patch
 URL:		http://cinepaint.org/
 BuildRequires:	OpenEXR-devel >= 1.0.0
 BuildRequires:	autoconf
@@ -145,9 +147,13 @@ Wtyczka do drukowania dla CinePainta.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
+%patch11 -p1
 
 # dead symlinks
 %{__rm} config.guess config.sub py-compile
+
+%{__sed} -i -e '1s,/usr/bin/env python,%{__python},' plug-ins/pygimp/plug-ins/*.py
 
 %build
 %{__libtoolize}

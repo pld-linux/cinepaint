@@ -1,5 +1,34 @@
 --- cinepaint/configure.in.orig	2013-03-22 22:35:07.518234103 +0100
 +++ cinepaint/configure.in	2013-03-22 22:56:46.378179589 +0100
+@@ -124,12 +124,13 @@ fi)
+ 
+   AC_DEFUN([AC_CINEPAINT_CHECK],
+   [
+-    AC_LANG(C)
++    AC_LANG_PUSH(C)
+ 	AM_PATH_GTK(1.2.8,,
+         [AC_MSG_WARN(Test for GTK failed. See the file 'INSTALL' for help.);
+          ERROR=1])
+         X_LIBS="$GTK_LIBS $LDFLAGS"
+         X_CFLAGS="$GTK_CFLAGS $CPPFLAGS"
++    AC_LANG_POP(C)
+   ])
+ 
+ if test -n "$use_gtk2"; then
+@@ -312,11 +313,12 @@ fi
+       else
+         dnl second Test for OpenEXR
+         AC_MSG_CHECKING(for openexr support)
+-        AC_LANG(C++)
++        AC_LANG_PUSH(C++)
+         AC_CHECK_HEADER(OpenEXR/half.h,,[AC_MSG_WARN([
+ *** OpenEXR dev header half.h not found
+ *** install OpenEXR and development packages or
+ *** download from http://www.openexr.org ]);ERROR=1])
++	AC_LANG_POP(C++)
+         OPENEXR_INCLUDES="-I/usr/include/OpenEXR -I/opt/local/include/OpenEXR -I${prefix}/include/OpenEXR"
+       fi
+     else
 @@ -514,7 +514,7 @@
      fi
      if test "x$FLTK_CONFIG" != "xno"; then

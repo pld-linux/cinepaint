@@ -105,3 +105,51 @@
  #endif
  #endif
  
+--- cinepaint/plug-ins/icc_examin/icc_examin/icc_oyranos_extern.c.orig	2008-08-22 20:11:18.000000000 +0200
++++ cinepaint/plug-ins/icc_examin/icc_examin/icc_oyranos_extern.c	2023-08-30 20:46:24.305406394 +0200
+@@ -219,10 +219,12 @@ oyStringCopy_       ( const char    * te
+     }
+   return text_copy;
+ }
+-# else
++# elif OYRANOS_VERSION < 906
+ char*
+ oyStringCopy_       ( const char    * text,
+                      oyAllocFunc_t   allocateFunc );
++#else
++#define oyStringCopy_ oyStringCopy
+ # endif
+ 
+ /** @brief manage complex oyNamedColour_s_ inside Oyranos
+--- cinepaint/app/cms.c.orig	2023-08-30 21:26:19.255765168 +0200
++++ cinepaint/app/cms.c	2023-08-30 22:15:12.389875016 +0200
+@@ -946,7 +946,15 @@ cms_read_standard_profile_dirs(icColorSp
+       oyProfile_s * temp_prof = 0;
+       oyProfiles_s * iccs = 0;
+ 
++#if OYRANOS_VERSION > 905
++      {
++      uint32_t icc_profile_flags =oyICCProfileSelectionFlagsFromOptions(
++        OY_CMM_STD, "//" OY_TYPE_STD "/icc_color", NULL, 0 );
++      iccs = oyProfiles_ForStd( type, icc_profile_flags, 0, 0 );
++      }
++#else
+       iccs = oyProfiles_ForStd( type, 0, 0 );
++#endif
+ 
+       size = oyProfiles_Count( iccs );
+       for( i = 0; i < size; ++i)
+--- cinepaint/app/main.c.orig	2023-08-30 22:17:15.649207263 +0200
++++ cinepaint/app/main.c	2023-08-31 06:21:44.881244644 +0200
+@@ -55,8 +55,10 @@ extern int _fmode;
+ 
+ #ifdef HAVE_OY
+ #include <oyranos/oyranos.h>
+-#include <oyranos/oyranos_config.h>
+ #include <oyranos/oyranos_version.h>
++#if OYRANOS_VERSION < 906
++#include <oyranos/oyranos_config.h>
++#endif
+ char *oyranos_temp_path = NULL;
+ void *myAlloc(size_t n) { return calloc(sizeof(char), n); }
+ #endif

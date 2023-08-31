@@ -10,3 +10,16 @@
  
  libcinepaint_la_SOURCES = \
  	chain.xpm \
+--- cinepaint/plug-ins/icc_examin/icc_examin/makefile.in.orig	2011-11-28 17:18:10.000000000 +0100
++++ cinepaint/plug-ins/icc_examin/icc_examin/makefile.in	2023-08-30 20:56:44.878711127 +0200
+@@ -34,8 +34,8 @@ CFLAGS_ = $(CFLAGS) $(DEBUG) $(ALL_INCL)
+ CXXFLAGS_ = $(CXXFLAGS) $(DEBUG) $(ALL_INCL)
+ 
+ top_builddir = ../../..
+-OPENEXR_LIBS = -pthread -lIlmImf -lz -lImath -lHalf -lIex -lIlmThread
+-CINEPAINT_HALF_LIBS = $(top_builddir)/libhalf/.libs/cinepaint_half.o
++OPENEXR_LIBS = -pthread -lz
++CINEPAINT_HALF_LIBS = -L$(top_builddir)/libhalf/.libs -lcinepaintHalf
+ 
+ 
+ 

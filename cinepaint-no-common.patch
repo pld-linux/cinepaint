@@ -1,0 +1,139 @@
+--- cinepaint/plug-ins/hdr/fromrad.h.orig	2008-05-22 06:20:12.000000000 +0200
++++ cinepaint/plug-ins/hdr/fromrad.h	2023-08-30 20:25:19.605591194 +0200
+@@ -184,7 +184,6 @@ struct check {
+  * Read and write image resolutions.
+  */
+ 
+-char  resolu_buf[RESOLU_BUFLEN];	/* resolution line buffer */
+ 
+ //----------------------------------------------
+ 
+--- cinepaint/plug-ins/hdr/fromrad.c.orig	2005-04-05 09:38:17.000000000 +0200
++++ cinepaint/plug-ins/hdr/fromrad.c	2023-08-30 20:25:19.708923968 +0200
+@@ -24,6 +24,7 @@
+ 
+ int expadj = 0;
+ char  FMTSTR[] = "FORMAT=";
++char  resolu_buf[RESOLU_BUFLEN];	/* resolution line buffer */
+ 
+ 
+ #if 0
+--- cinepaint/plug-ins/iol/iol.h.orig	2006-12-23 08:14:10.000000000 +0100
++++ cinepaint/plug-ins/iol/iol.h	2023-08-30 21:02:38.336796280 +0200
+@@ -50,24 +50,24 @@ typedef struct {
+ 	char *name;
+ } s_table_t;
+ 
+-code_t *code;
+-float stack[512], vars[NUM_SYMBOLS];
+-int pc;					/* the program counter */
++extern code_t *code;
++extern float stack[512], vars[NUM_SYMBOLS];
++extern int pc;					/* the program counter */
+ 
+-s_table_t s_table[NUM_SYMBOLS];
++extern s_table_t s_table[NUM_SYMBOLS];
+ 
+-int lineno;
+-char *iol_input, *iol_input_ptr;
+-unsigned int iol_input_lim;
+-int input_size;
++extern int lineno;
++extern char *iol_input, *iol_input_ptr;
++extern unsigned int iol_input_lim;
++extern int input_size;
+ 
+-iol_vals ivals;
+-iol_color in_color,out_color;
++extern iol_vals ivals;
++extern iol_color in_color,out_color;
+ 
+-int dialog_status;
+-int do_out;
++extern int dialog_status;
++extern int do_out;
+ 
+-int xsize, ysize, xpos, ypos;
++extern int xsize, ysize, xpos, ypos;
+ 
+ /* in main.c */
+ int iol_process(void);
+--- cinepaint/plug-ins/iol/fg.h.orig	2006-09-25 19:03:37.000000000 +0200
++++ cinepaint/plug-ins/iol/fg.h	2023-08-30 21:20:14.604407321 +0200
+@@ -25,16 +25,16 @@
+ #include <libgimp/gimp.h>
+ #include <libgimp/gimpui.h>
+ 
+-GDrawable *drawable;
+-GPrecisionType precision;
+-gint num_channels;
+-gint32 drawable_ID;
+-GRunModeType run_mode;
++extern GDrawable *drawable;
++extern GPrecisionType precision;
++extern gint num_channels;
++extern gint32 drawable_ID;
++extern GRunModeType run_mode;
+ 
+-guchar *src_row, *dest_row;
+-guint8 *srcu8, *destu8;
+-guint16 *srcu16, *destu16;
+-guint16 *srcf16, *destf16;
+-gfloat *srcf32, *destf32;
++extern guchar *src_row, *dest_row;
++extern guint8 *srcu8, *destu8;
++extern guint16 *srcu16, *destu16;
++extern guint16 *srcf16, *destf16;
++extern gfloat *srcf32, *destf32;
+ 
+ #endif /* _FG_H_ */
+--- cinepaint/plug-ins/iol/main.c.orig	2006-10-05 22:30:42.000000000 +0200
++++ cinepaint/plug-ins/iol/main.c	2023-08-30 21:20:48.824221936 +0200
+@@ -72,6 +72,37 @@
+ 	if(u > 1.0) u = 1.0; \
+ 	if(u < 0.0) u = 0.0
+ 
++code_t *code;
++float stack[512], vars[NUM_SYMBOLS];
++int pc;					/* the program counter */
++
++s_table_t s_table[NUM_SYMBOLS];
++
++int lineno;
++char *iol_input, *iol_input_ptr;
++unsigned int iol_input_lim;
++int input_size;
++
++iol_vals ivals;
++iol_color in_color,out_color;
++
++int dialog_status;
++int do_out;
++
++int xsize, ysize, xpos, ypos;
++
++GDrawable *drawable;
++GPrecisionType precision;
++gint num_channels;
++gint32 drawable_ID;
++GRunModeType run_mode;
++
++guchar *src_row, *dest_row;
++guint8 *srcu8, *destu8;
++guint16 *srcu16, *destu16;
++guint16 *srcf16, *destf16;
++gfloat *srcf32, *destf32;
++
+ /* Declare local functions.
+  */
+ static void query(void);
+--- cinepaint/app/interface.c.orig	2007-11-09 16:24:27.000000000 +0100
++++ cinepaint/app/interface.c	2023-08-31 19:38:22.829448670 +0200
+@@ -313,7 +313,6 @@ gint num_tools = NUM_TOOLS;//sizeof (too
+  */
+ GtkWidget *tool_widgets[NUM_TOOLS+NUM_TOOLS_NONVIS];
+ GtkWidget *tool_label;
+-GtkTooltips *tool_tips;
+ 
+ /*  The popup shell is a pointer to the gdisplay shell that posted the latest
+  *  popup menu.  When this is null, and a command is invoked, then the
