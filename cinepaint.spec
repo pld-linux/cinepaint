@@ -24,6 +24,8 @@ Patch8:		%{name}-include.patch
 Patch9:		%{name}-python.patch
 Patch10:	%{name}-extern.patch
 Patch11:	%{name}-no-common.patch
+Patch12:	%{name}-ptr.patch
+Patch13:	%{name}-gcc.patch
 URL:		http://cinepaint.org/
 BuildRequires:	OpenEXR-devel >= 1.0.0
 BuildRequires:	autoconf
@@ -149,6 +151,8 @@ Wtyczka do drukowania dla CinePainta.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
+%patch13 -p1
 
 # dead symlinks
 %{__rm} config.guess config.sub py-compile

@@ -1,0 +1,12 @@
+--- cinepaint/plug-ins/icc_examin/icc_examin/icc_cinepaint.cpp.orig	2007-11-29 10:55:21.000000000 +0100
++++ cinepaint/plug-ins/icc_examin/icc_examin/icc_cinepaint.cpp	2023-09-01 06:21:02.279247963 +0200
+@@ -59,7 +59,8 @@
+ #include <cstring>
+ #include <vector>
+ 
+-using namespace std;
++using std::cout;
++using std::max;
+ 
+ 
+ extern "C" {
