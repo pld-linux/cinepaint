@@ -1,0 +1,791 @@
+--- cinepaint/lib/plugin_main.c.orig	2007-10-25 12:17:36.000000000 +0200
++++ cinepaint/lib/plugin_main.c	2024-11-17 22:06:48.128938358 +0100
+@@ -104,7 +104,8 @@ const guint gimp_minor_version = MINOR_V
+ const guint gimp_micro_version = MICRO_VERSION;
+ 
+ int   argc = 0;
+-char **argv = {""};
++char *argv_def[] = {""};
++char **argv = argv_def;
+ 
+ static gdouble _gamma_val;
+ static gint _install_cmap;
+--- cinepaint/lib/widgets.c.orig	2006-11-24 00:58:28.000000000 +0100
++++ cinepaint/lib/widgets.c	2024-11-17 22:10:05.586757424 +0100
+@@ -1051,7 +1051,7 @@ gimp_mem_size_entry_new (GtkAdjustment *
+   gtk_widget_show (spinbutton);
+ 
+   optionmenu =
+-    gimp_option_menu_new2 (FALSE, gimp_mem_size_unit_callback,
++    gimp_option_menu_new2 (FALSE, GTK_SIGNAL_FUNC(gimp_mem_size_unit_callback),
+ 			   gmsed, (gpointer) mem_size_unit,
+ 
+ 			   _("Bytes"),     (gpointer) 1, NULL,
+--- cinepaint/plug-ins/dicom/dicom.c.orig	2024-11-17 21:35:00.581181586 +0100
++++ cinepaint/plug-ins/dicom/dicom.c	2024-11-18 21:41:47.420052894 +0100
+@@ -131,9 +131,9 @@ typedef struct _DicomInfo
+ /* Declare some local functions.
+  */
+ static void   query      (void);
+-static void   run        (const gchar      *name,
++static void   run        (      gchar      *name,
+                           gint              nparams,
+-                          const GimpParam  *param,
++                                GimpParam  *param,
+                           gint             *nreturn_vals,
+                           GimpParam       **return_vals);
+ static gint32 load_image (gchar  *filename);
+@@ -219,9 +219,9 @@ query (void)
+ }
+ 
+ static void
+-run (const gchar*     name,
++run (      gchar*     name,
+      gint             nparams,
+-     const GimpParam* param,
++           GimpParam* param,
+      gint*            nreturn_vals,
+      GimpParam**      return_vals)
+ {
+--- cinepaint/plug-ins/gbr/gbr.c.orig	2007-03-21 10:45:01.000000000 +0100
++++ cinepaint/plug-ins/gbr/gbr.c	2024-11-18 21:48:32.845770982 +0100
+@@ -644,7 +644,7 @@ static guchar * buffer_to_host_order ( g
+ 					gint image_type)
+ {
+   gint i, k;
+-  guchar *c,tmp;
++  guchar tmp;
+   switch (image_type)
+   {
+     case RGB_IMAGE:
+@@ -670,10 +670,7 @@ static guchar * buffer_to_host_order ( g
+ 	    for( k = 0 ; k < num_channels; k++)
+             {
+ #ifndef WORDS_BIGENDIAN
+-              c = b;
+-              tmp = c[0];
+-              c[0] = c[1];
+-              c[1] = tmp;
++	      *b = __builtin_bswap16(*b);
+ #endif
+ 	      /*ntohs (*b);*/
+               ++b;
+--- cinepaint/plug-ins/jpeg/jpeg.c.orig	2008-05-24 14:47:17.000000000 +0200
++++ cinepaint/plug-ins/jpeg/jpeg.c	2024-11-18 21:54:19.211141980 +0100
+@@ -464,7 +464,7 @@ load_image (char *filename)
+   // Step 6a: read icc profile
+   {
+     LPBYTE Buffer = NULL;
+-    size_t Len = 0;
++    unsigned Len = 0;
+     cmsHPROFILE hProfile=NULL;
+ 
+     if (read_icc_profile(&cinfo, &Buffer, &Len))
+--- cinepaint/plug-ins/iol/iol.h.orig	2024-11-17 21:35:00.624515171 +0100
++++ cinepaint/plug-ins/iol/iol.h	2024-11-18 21:58:37.955997508 +0100
+@@ -84,4 +84,6 @@ void outp(int r, int g, int b, int a);
+ void size(int x, int y);
+ void pos(int x, int y);
+ 
++int yylex(void);
++
+ #endif /* _IOL_H_ */
+--- cinepaint/plug-ins/print/print-image-gimp.c.orig	2007-01-13 22:59:12.000000000 +0100
++++ cinepaint/plug-ins/print/print-image-gimp.c	2024-11-19 18:02:10.347363869 +0100
+@@ -97,7 +97,7 @@ typedef struct
+   gint32 real_bpp;
+   gint32 samples;
+   GimpImageBaseType base_type;
+-  guint16 *cmap;
++  guint8 *cmap; // according to app/gimage_cmds.c cmap contains 3*byte for each color
+   guint16 *alpha_table;
+   guint16 *tmp;
+   gint last_printed_percent;
+@@ -506,9 +506,9 @@ Image_get_row             ( stp_image_t
+ 	  for (i = 0; i < im->w; i++)
+ 	    {
+ 	      int j;
+-	      for (j = 0; j < 4; j++)
++	      for (j = 0; j < 3; j++)
+ 		{
+-		  gint32 tval = im->cmap[(4 * inter[2 * i]) + j];
++		  gint32 tval = im->cmap[(3 * inter[2 * i]) + j];
+ 		  dest[(4 * i) + j] = alpha_lookup(im, tval,
+ 						   inter[(2 * i) + 1]);
+ 		}
+@@ -519,9 +519,9 @@ Image_get_row             ( stp_image_t
+ 	{
+ 	  for (i = 0; i < im->w; i++)
+ 	    {
+-	      dest[(4 * i) + 0] = im->cmap[(4 * inter[i]) + 0];
+-	      dest[(4 * i) + 1] = im->cmap[(4 * inter[i]) + 1];
+-	      dest[(4 * i) + 2] = im->cmap[(4 * inter[i]) + 2];
++	      dest[(4 * i) + 0] = im->cmap[(3 * inter[i]) + 0];
++	      dest[(4 * i) + 1] = im->cmap[(3 * inter[i]) + 1];
++	      dest[(4 * i) + 2] = im->cmap[(3 * inter[i]) + 2];
+ 	    }
+ 	}
+     }
+--- cinepaint/plug-ins/script-fu/script-fu-console.c.orig	2009-01-16 17:06:21.000000000 +0100
++++ cinepaint/plug-ins/script-fu/script-fu-console.c	2024-11-19 19:09:44.558030414 +0100
+@@ -370,7 +370,7 @@ apply_callback (gchar           *proc_na
+ 		gchar           *proc_author,
+ 		gchar           *proc_copyright,
+ 		gchar           *proc_date,
+-		GimpPDBProcType  proc_type,
++		int              proc_type,
+ 		gint             nparams,
+ 		gint             nreturn_vals,
+ 		GimpParamDef    *params,
+@@ -425,7 +425,7 @@ script_fu_siod_read (GIOChannel  *channe
+ 		     GIOCondition cond,
+ 		     gpointer     data)
+ {
+-  int count;
++  gsize count;
+   static int hack = 0;
+   GIOError error;
+ 
+--- cinepaint/app/colormaps.h.orig	2024-11-19 21:27:50.914118346 +0100
++++ cinepaint/app/colormaps.h	2024-11-21 18:39:03.936956822 +0100
+@@ -24,23 +24,23 @@ extern GdkVisual *g_visual;
+ extern GdkColormap *g_cmap;
+ 
+ /*  Pixel values of black and white  */
+-extern gulong g_black_pixel;
+-extern gulong g_gray_pixel;
+-extern gulong g_white_pixel;
+-extern gulong g_color_pixel;
+-extern gulong g_normal_guide_pixel;
+-extern gulong g_active_guide_pixel;
++extern guint32 g_black_pixel;
++extern guint32 g_gray_pixel;
++extern guint32 g_white_pixel;
++extern guint32 g_color_pixel;
++extern guint32 g_normal_guide_pixel;
++extern guint32 g_active_guide_pixel;
+ 
+ /*  Foreground and Background colors  */
+-extern gulong foreground_pixel;
+-extern gulong background_pixel;
++extern guint32 foreground_pixel;
++extern guint32 background_pixel;
+ 
+ /*  Old and New colors  */
+-extern gulong old_color_pixel;
+-extern gulong new_color_pixel;
++extern guint32 old_color_pixel;
++extern guint32 new_color_pixel;
+ 
+ /*  Colormap entries reserved for color cycled marching ants--optional  */
+-extern gulong  marching_ants_pixels[8];
++extern guint32 marching_ants_pixels[8];
+ 
+ extern GtkDitherInfo *red_ordered_dither;
+ extern GtkDitherInfo *green_ordered_dither;
+@@ -57,11 +57,11 @@ extern gulong *color_pixel_vals;
+ extern gulong *gray_pixel_vals;
+ 
+ gulong get_color (PixelRow *);
+-void   store_color (gulong *pixel, PixelRow *);
+-void   store_display_color (gulong *pixel, PixelRow *);
++void   store_color (guint32 *pixel, PixelRow *);
++void   store_display_color (guint32 *pixel, PixelRow *);
+ void   get_standard_colormaps (void);
+ 
+-void   cp_pixel_to_gdkcolor(GdkColor *c, const gulong *pixel);
++void   cp_pixel_to_gdkcolor(GdkColor *c, const guint32 *pixel);
+ 
+ 
+ #endif  /*  __COLORMAPS_H__  */
+--- cinepaint/app/depth/colormaps.c.orig	2006-11-24 00:52:55.000000000 +0100
++++ cinepaint/app/depth/colormaps.c	2024-11-21 18:39:23.990408041 +0100
+@@ -37,20 +37,20 @@
+ GdkVisual *g_visual = NULL;
+ GdkColormap *g_cmap = NULL;
+ 
+-gulong g_black_pixel;
+-gulong g_gray_pixel;
+-gulong g_white_pixel;
+-gulong g_color_pixel;
+-gulong g_normal_guide_pixel;
+-gulong g_active_guide_pixel;
++guint32 g_black_pixel;
++guint32 g_gray_pixel;
++guint32 g_white_pixel;
++guint32 g_color_pixel;
++guint32 g_normal_guide_pixel;
++guint32 g_active_guide_pixel;
+ 
+-gulong foreground_pixel;
+-gulong background_pixel;
++guint32 foreground_pixel;
++guint32 background_pixel;
+ 
+-gulong old_color_pixel;
+-gulong new_color_pixel;
++guint32 old_color_pixel;
++guint32 new_color_pixel;
+ 
+-gulong marching_ants_pixels[8];
++guint32 marching_ants_pixels[8];
+ 
+ GtkDitherInfo *red_ordered_dither;
+ GtkDitherInfo *green_ordered_dither;
+@@ -67,7 +67,7 @@ gulong *g_lookup_blue;
+ gulong *color_pixel_vals;
+ gulong *gray_pixel_vals;
+ 
+-static void make_color (gulong *pixel_ptr,
++static void make_color (guint32 *pixel_ptr,
+ 			int     red,
+ 			int     green,
+ 			int     blue,
+@@ -138,7 +138,7 @@ get_color (PixelRow * col)
+ 
+ 
+ static void
+-make_color (gulong *pixel_ptr,
++make_color (guint32 *pixel_ptr,
+ 	    int     red,
+             int     green,
+             int     blue,
+@@ -148,14 +148,14 @@ make_color (gulong *pixel_ptr,
+ }
+ 
+ void
+-store_color (gulong *pixel_ptr,
++store_color (guint32 *pixel_ptr,
+ 	     PixelRow * col)
+ {
+   *pixel_ptr = get_color (col);
+ }
+ 
+ void
+-store_display_color (gulong *pixel_ptr,
++store_display_color (guint32 *pixel_ptr,
+ 	     PixelRow * col)
+ {
+   guint8 d[3];
+@@ -181,7 +181,7 @@ store_display_color (gulong *pixel_ptr,
+ }
+ 
+ void
+-cp_pixel_to_gdkcolor(GdkColor *c, const gulong *pixel)
++cp_pixel_to_gdkcolor(GdkColor *c, const guint32 *pixel)
+ {
+   const char *cc = (const char*)pixel;
+ 
+--- cinepaint/app/depth/dodgeburn.c.orig	2007-11-09 16:26:15.000000000 +0100
++++ cinepaint/app/depth/dodgeburn.c	2024-11-20 19:10:03.397314366 +0100
+@@ -39,7 +39,7 @@
+ #include "../devices.h"
+ 
+ void dodgeburn_area ( PixelArea *, PixelArea *, gint,gint,gfloat  );
+-typedef void  (*DodgeburnRowFunc) (PixelArea*,PixelArea*,gint,gfloat);
++typedef void  (*DodgeburnRowFunc) (PixelRow*,PixelRow*,gint,gfloat);
+ 
+ //u16
+ void dodge_highlights_row_u16 ( PixelRow *src_row, PixelRow *dest_row, 
+--- cinepaint/app/depth/levels.c.orig	2007-11-29 11:08:06.000000000 +0100
++++ cinepaint/app/depth/levels.c	2024-11-20 19:28:25.420375845 +0100
+@@ -3144,7 +3144,7 @@ levels_button_press (Tool           *too
+     hLab = cmsCreateLabProfile(cmsD50_xyY());
+     if (gdisp->gimage->cms_profile) {
+       char* data;
+-      int size;
++      size_t size;
+       data = cms_get_profile_data (gimage_get_cms_profile (gdisp->gimage),
+                                    &size );
+       imageProfile = cmsOpenProfileFromMem(data, size);
+--- cinepaint/app/depth/paint_core_16.c.orig	2007-11-09 16:26:15.000000000 +0100
++++ cinepaint/app/depth/paint_core_16.c	2024-11-20 20:35:39.887159399 +0100
+@@ -555,19 +555,19 @@ paint_core_16_button_press  (Tool * tool
+ 
+   /* wacom stuff */
+ #if GTK_MAJOR_VERSION > 1
+-      if (gdk_event_get_axis (bevent, GDK_AXIS_PRESSURE, &paint_core->curpressure))
++      if (gdk_event_get_axis ((GdkEvent*)bevent, GDK_AXIS_PRESSURE, &paint_core->curpressure))
+         paint_core->curpressure = CLAMP (paint_core->curpressure, .0,
+                                   1.);
+       else
+         paint_core->curpressure = 1.0;
+ 
+-      if (gdk_event_get_axis (bevent, GDK_AXIS_XTILT, &paint_core->curxtilt))
++      if (gdk_event_get_axis ((GdkEvent*)bevent, GDK_AXIS_XTILT, &paint_core->curxtilt))
+         paint_core->curxtilt = CLAMP (paint_core->curxtilt, -1.0,
+                                1.0);
+       else
+         paint_core->curxtilt = 0.0;
+ 
+-      if (gdk_event_get_axis (bevent, GDK_AXIS_YTILT, &paint_core->curytilt))
++      if (gdk_event_get_axis ((GdkEvent*)bevent, GDK_AXIS_YTILT, &paint_core->curytilt))
+         paint_core->curytilt = CLAMP (paint_core->curytilt, -1.0,
+                                1.0);
+       else
+@@ -695,13 +695,13 @@ paint_core_16_motion  (
+   paint_core->state = mevent->state;
+   /*wacom */
+ #if GTK_MAJOR_VERSION > 1
+-      if (gdk_event_get_axis (mevent, GDK_AXIS_PRESSURE, &paint_core->curpressure))
++      if (gdk_event_get_axis ((GdkEvent*)mevent, GDK_AXIS_PRESSURE, &paint_core->curpressure))
+         paint_core->curpressure = CLAMP (paint_core->curpressure, .0,
+                                   1.);
+       else
+         paint_core->curpressure = 1.0;
+ 
+-      if (gdk_event_get_axis (mevent, GDK_AXIS_XTILT, &paint_core->curxtilt))
++      if (gdk_event_get_axis ((GdkEvent*)mevent, GDK_AXIS_XTILT, &paint_core->curxtilt))
+       {
+ # ifdef DEBUG_
+         printf("curxtilt = %f",paint_core->curxtilt);
+@@ -711,7 +711,7 @@ paint_core_16_motion  (
+       } else
+         paint_core->curxtilt = 0.0;
+ 
+-      if (gdk_event_get_axis (mevent, GDK_AXIS_YTILT, &paint_core->curytilt))
++      if (gdk_event_get_axis ((GdkEvent*)mevent, GDK_AXIS_YTILT, &paint_core->curytilt))
+       {
+ # ifdef DEBUG_
+         printf("curytilt = %f\n",paint_core->curytilt);
+--- cinepaint/app/app_procs.c.orig	2007-11-09 16:24:26.000000000 +0100
++++ cinepaint/app/app_procs.c	2024-11-20 20:40:31.732197180 +0100
+@@ -74,6 +74,7 @@
+ #include "brush.h"
+ #include "layout.h"
+ #include "minimize.h"
++#include "store_frame_manager.h"
+ #include "depth/displaylut.h"
+ 
+ #include "config.h"
+--- cinepaint/app/base_frame_manager.c.orig	2006-12-30 19:18:49.000000000 +0100
++++ cinepaint/app/base_frame_manager.c	2024-11-20 20:46:51.231087003 +0100
+@@ -20,6 +20,7 @@
+ #include <stdio.h>
+ #include "general.h"
+ #include <string.h>
++#include <sys/stat.h>
+ #include "layer_pvt.h"
+ #include "../lib/wire/iodebug.h"
+ 
+--- cinepaint/app/cms.c.orig	2024-11-17 21:35:00.591181644 +0100
++++ cinepaint/app/cms.c	2024-11-20 20:58:38.758564606 +0100
+@@ -349,8 +349,9 @@ void* my_alloc_func( size_t size )
+ 
+ #ifdef HAVE_OY
+ # if OYRANOS_VERSION > 107
+-int iccMessageFunc( int code, const oyStruct_s * context, const char * format, ... )
++int iccMessageFunc( int code, const oyPointer ctx, const char * format, ... )
+ {
++  const oyStruct_s *context = ctx;
+   char* text = 0, *pos = 0;
+   va_list list;
+   const char * type_name = "";
+--- cinepaint/app/color_correction_gui.c.orig	2006-11-24 00:46:39.000000000 +0100
++++ cinepaint/app/color_correction_gui.c	2024-11-20 21:34:55.214680348 +0100
+@@ -314,7 +314,7 @@ _color_correction_gui_create (_ColorCorr
+     mainhbox = gtk_hbox_new(FALSE,0);
+     button = gtk_check_button_new_with_label("Colour Wheels");
+     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+-    gtk_signal_connect(GTK_OBJECT(button), "toggled", _color_correction_gui_wheels_tab_toggled_cb, data);
++    gtk_signal_connect(GTK_OBJECT(button), "toggled", GTK_SIGNAL_FUNC (_color_correction_gui_wheels_tab_toggled_cb), data);
+     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), mainhbox, button);
+ 
+     hbox = gtk_hbox_new(FALSE, 0);
+@@ -552,24 +552,24 @@ _color_correction_gui_update_lslider_han
+ static void
+ _color_correction_gui_update_spins (_ColorCorrectionGui *data,
+ 				    ColorCorrectionLightnessRange range)
+-{    gtk_signal_handler_block_by_func(GTK_OBJECT(data->spins[range][HUE]), _color_correction_gui_spin_changed_cb, data);
++{    gtk_signal_handler_block_by_func(GTK_OBJECT(data->spins[range][HUE]), GTK_SIGNAL_FUNC(_color_correction_gui_spin_changed_cb), data);
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (data->spins[range][HUE]), 
+ 				data->settings->values[range][HUE]);        
+-     gtk_signal_handler_unblock_by_func(GTK_OBJECT(data->spins[range][HUE]), _color_correction_gui_spin_changed_cb, data);
++     gtk_signal_handler_unblock_by_func(GTK_OBJECT(data->spins[range][HUE]), GTK_SIGNAL_FUNC(_color_correction_gui_spin_changed_cb), data);
+  
+      gtk_signal_handler_block_by_func(GTK_OBJECT(data->spins[range][SATURATION]), 
+-				      _color_correction_gui_spin_changed_cb, data);
++				      GTK_SIGNAL_FUNC(_color_correction_gui_spin_changed_cb), data);
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (data->spins[range][SATURATION]), 
+ 				data->settings->values[range][SATURATION]*100);        
+      gtk_signal_handler_unblock_by_func(GTK_OBJECT(data->spins[range][SATURATION]), 
+-					_color_correction_gui_spin_changed_cb, data);
++					GTK_SIGNAL_FUNC(_color_correction_gui_spin_changed_cb), data);
+ 
+      gtk_signal_handler_block_by_func(GTK_OBJECT(data->spins[range][LIGHTNESS]), 
+-				      _color_correction_gui_spin_changed_cb, data);
++				      GTK_SIGNAL_FUNC(_color_correction_gui_spin_changed_cb), data);
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (data->spins[range][LIGHTNESS]), 
+ 				(data->settings->values[range][LIGHTNESS]+0.5)*100);        
+      gtk_signal_handler_unblock_by_func(GTK_OBJECT(data->spins[range][LIGHTNESS]), 
+-					_color_correction_gui_spin_changed_cb, data);     
++					GTK_SIGNAL_FUNC(_color_correction_gui_spin_changed_cb), data);
+ }
+ 
+ 
+--- cinepaint/app/fileops.c.orig	2007-11-09 16:24:26.000000000 +0100
++++ cinepaint/app/fileops.c	2024-11-20 21:42:25.337335676 +0100
+@@ -1374,7 +1374,7 @@ file_check_extension (char * filename,
+     ext = last_dot + 1;
+ /* modified by IMAGEWORKS (doug creel 01/30/02) */
+     regcomp(&tmp, ext, REG_EXTENDED|REG_NOSUB);
+-    if(regexec(&tmp, extension, NULL, NULL, NULL) == 0)
++    if(regexec(&tmp, extension, 0, NULL, 0) == 0)
+     {
+       regfree(&tmp);
+       return FALSE;
+--- cinepaint/app/gdisplay.c.orig	2024-11-17 21:35:00.591181644 +0100
++++ cinepaint/app/gdisplay.c	2024-11-20 21:49:03.983018264 +0100
+@@ -48,6 +48,7 @@
+ #include "tools.h"
+ #include "undo.h"
+ #include "base_frame_manager.h"
++#include "store_frame_manager.h"
+ 
+ #include "layer_pvt.h"			/* ick. */
+ 
+@@ -2344,7 +2345,7 @@ gdisplay_cms_transform_get( GDisplay *gd
+   int cms_flags = gdisplay_get_cms_flags( gdisp );
+   int cms_proof_flags = gdisplay_get_cms_flags( gdisp );
+   int cms_proof_intent = gdisplay_get_cms_proof_intent( gdisp );
+-  CMSTransform * cms_expensive_transf = gdisp->cms_expensive_transf;
++  CMSTransform ** cms_expensive_transf = gdisp->cms_expensive_transf;
+ 
+   if (colormanaged)
+   {   /* combine profiles */
+--- cinepaint/app/gradient.c.orig	2007-11-09 16:24:27.000000000 +0100
++++ cinepaint/app/gradient.c	2024-11-20 21:50:25.386827776 +0100
+@@ -5452,7 +5452,7 @@ grad_load_gradient(char *filename)
+           g_message (_("Corrupt segment %d in gradient file '%s'."),
+                      i, filename);
+           fclose (file);
+-          return NULL;
++          return;
+         }
+ #else
+ 		if (sscanf(line, "%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf%lf%d%d",
+--- cinepaint/app/interface.c.orig	2024-11-17 21:35:00.624515171 +0100
++++ cinepaint/app/interface.c	2024-11-21 06:15:54.119786275 +0100
+@@ -92,7 +92,7 @@ typedef struct ToolButton ToolButton;
+ struct ToolButton
+ {
+   char **icon_data;
+-  char **tango_icon_data;
++  char  *tango_icon_data;
+   char  *tool_desc;
+   gpointer callback_data;
+ };
+@@ -134,114 +134,114 @@ struct ToolButton
+ static ToolButton tool_data[] =
+ {
+   { (char **) rect_bits,
+-    (char **) stock_tool_rect_select_22,
++    (char *) stock_tool_rect_select_22,
+     "Select rectangular regions",
+     (gpointer) RECT_SELECT },
+   { (char **) circ_bits,
+-    (char **) stock_tool_ellipse_select_22,
++    (char *) stock_tool_ellipse_select_22,
+     "Select elliptical regions",
+     (gpointer) ELLIPSE_SELECT },
+   { (char **) free_bits,
+-    (char **) stock_tool_free_select_22,
++    (char *) stock_tool_free_select_22,
+     "Select hand-drawn regions",
+     (gpointer) FREE_SELECT },
+ 
+   { (char **) fuzzy_bits,
+-    (char **) stock_tool_fuzzy_select_22,
++    (char *) stock_tool_fuzzy_select_22,
+     "Select contiguous regions",
+     (gpointer) FUZZY_SELECT },
+   { (char **) bezier_bits,
+-    (char **) stock_tool_path_22,
++    (char *) stock_tool_path_22,
+     "Select regions using Bezier curves",
+     (gpointer) BEZIER_SELECT },
+   { (char **) iscissors_bits,
+-    (char **) stock_tool_iscissors_22,
++    (char *) stock_tool_iscissors_22,
+     "Select shapes from image",
+     (gpointer) ISCISSORS },
+ 
+   { (char **) move_bits,
+-    (char **) stock_tool_move_22,
++    (char *) stock_tool_move_22,
+     "Move layers & selections",
+     (gpointer) MOVE },
+   { (char **) magnify_bits,
+-    (char **) stock_tool_zoom_22,
++    (char *) stock_tool_zoom_22,
+     "Zoom in & out",
+     (gpointer) MAGNIFY },
+   { (char **) crop_bits,
+-    (char **) stock_tool_crop_22,
++    (char *) stock_tool_crop_22,
+     "Crop the image",
+     (gpointer) CROP },
+ 
+   { (char **) scale_bits,
+-    (char **) stock_tool_scale_22,
++    (char *) stock_tool_scale_22,
+     "Transform the layer or selection (rotate, scale, share, perspective)",
+     (gpointer) ROTATE },
+   { (char **) horizflip_bits,
+-    (char **) stock_tool_flip_22,
++    (char *) stock_tool_flip_22,
+     "Flip the layer or selection",
+     (gpointer) FLIP_HORZ },
+   { (char **) text_bits,
+-    (char **) stock_tool_text_22,
++    (char *) stock_tool_text_22,
+     "Add text to the image",
+     (gpointer) TEXT },
+   { (char **) spline_bits,
+-    (char **) stock_tool_spline_22,
++    (char *) stock_tool_spline_22,
+     "Spline",
+     (gpointer) SPLINE },
+ 
+   { (char **) colorpicker_bits,
+-    (char **) stock_tool_color_picker_22,
++    (char *) stock_tool_color_picker_22,
+     "Pick colors from the image",
+     (gpointer) COLOR_PICKER },
+   { (char **) fill_bits,
+-    (char **) stock_tool_bucket_fill_22,
++    (char *) stock_tool_bucket_fill_22,
+     "Fill with a color or pattern",
+     (gpointer) BUCKET_FILL },
+   { (char **) gradient_bits,
+-    (char **) stock_tool_blend_22,
++    (char *) stock_tool_blend_22,
+     "Fill with a color gradient",
+     (gpointer) BLEND },
+ 
+   { (char **) pencil_bits,
+-    (char **) stock_tool_pencil_22,
++    (char *) stock_tool_pencil_22,
+     "Draw sharp pencil strokes",
+     (gpointer) PENCIL },
+   { (char **) paint_bits,
+-    (char **) stock_tool_paintbrush_22,
++    (char *) stock_tool_paintbrush_22,
+     "Paint fuzzy brush strokes",
+     (gpointer) PAINTBRUSH },
+   { (char **) erase_bits,
+-    (char **) stock_tool_eraser_22,
++    (char *) stock_tool_eraser_22,
+     "Erase to background or transparency",
+     (gpointer) ERASER },
+ 
+   { (char **) airbrush_bits,
+-    (char **) stock_tool_airbrush_22,
++    (char *) stock_tool_airbrush_22,
+     "Airbrush with variable pressure",
+     (gpointer) AIRBRUSH },
+   { (char **) clone_bits,
+-    (char **) stock_tool_clone_22,
++    (char *) stock_tool_clone_22,
+     "Clone image regions",
+     (gpointer) CLONE },
+   { (char **) blur_bits,
+-    (char **) stock_tool_blur_22,
++    (char *) stock_tool_blur_22,
+     "Blur or sharpen",
+     (gpointer) CONVOLVE },
+ 
+   { (char **) dodge_bits,
+-    (char **) stock_tool_dodge_22,
++    (char *) stock_tool_dodge_22,
+     "Dodge or burn",
+     (gpointer) DODGEBURN },
+   { (char **) smudge_bits,
+-    (char **) stock_tool_smudge_22,
++    (char *) stock_tool_smudge_22,
+     "Smudge",
+     (gpointer) SMUDGE },
+   { (char **) measure_bits,
+-    (char **) stock_tool_measure_22,
++    (char *) stock_tool_measure_22,
+     "Measure",
+     (gpointer) MEASURE },
+   { (char **) spline_edit_bits,
+-    (char **) stock_tool_edit_spline_22,
++    (char *) stock_tool_edit_spline_22,
+     "Spline Edit",
+     (gpointer) SPLINE_EDIT },
+ };
+--- cinepaint/app/layers_dialog.c.orig	2007-11-09 16:24:27.000000000 +0100
++++ cinepaint/app/layers_dialog.c	2024-11-21 06:17:29.170568268 +0100
+@@ -2773,7 +2773,7 @@ layer_widget_preview_redraw (LayerWidget
+ # ifdef DEBUG
+     printf("%s:%d %s() wrong data or widget\n", __FILE__,__LINE__,__func__);
+ # endif
+-    return FALSE;
++    return;
+   }
+ 
+ 
+--- cinepaint/app/look_profile.c.orig	2007-06-10 19:40:58.000000000 +0200
++++ cinepaint/app/look_profile.c	2024-11-21 06:28:26.380860511 +0100
+@@ -4,6 +4,7 @@
+ #include "../lib/version.h"
+ #include "actionarea.h"
+ #include "base_frame_manager.h"
++#include "store_frame_manager.h"
+ #include "cms.h"
+ #include "drawable.h"
+ #include "floating_sel.h"
+--- cinepaint/app/ops_buttons.c.orig	2007-06-10 19:27:08.000000000 +0200
++++ cinepaint/app/ops_buttons.c	2024-11-21 18:38:14.416665715 +0100
+@@ -62,9 +62,9 @@ GtkWidget *ops_button_box_new (GtkWidget
+       gtk_container_border_width (GTK_CONTAINER (box), 0);
+       
+ #if GTK_MAJOR_VERSION > 1
+-      pixmap = gdk_pixbuf_new_from_xpm_data (ops_buttons->xpm_data);
++      pixmap = gdk_pixbuf_new_from_xpm_data ((const gchar**)ops_buttons->xpm_data);
+       pixmapwid = gtk_image_new_from_pixbuf(pixmap);
+-      is_pixmap = gdk_pixbuf_new_from_xpm_data (ops_buttons->xpm_is_data);
++      is_pixmap = gdk_pixbuf_new_from_xpm_data ((const gchar**)ops_buttons->xpm_is_data);
+ #else
+       pixmap = gdk_pixmap_create_from_xpm_d (parent->window,
+ 					     &mask,
+@@ -140,9 +140,9 @@ GtkWidget *ops_button_box_new2 (GtkWidge
+       gtk_container_border_width (GTK_CONTAINER (box), 0);
+       
+ #if GTK_MAJOR_VERSION > 1
+-      pixmap = gdk_pixbuf_new_from_xpm_data (ops_buttons->xpm_data);
++      pixmap = gdk_pixbuf_new_from_xpm_data ((const gchar**)ops_buttons->xpm_data);
+       pixmapwid = gtk_image_new_from_pixbuf(pixmap);
+-      is_pixmap = gdk_pixbuf_new_from_xpm_data (ops_buttons->xpm_is_data);
++      is_pixmap = gdk_pixbuf_new_from_xpm_data ((const gchar**)ops_buttons->xpm_is_data);
+ #else
+       pixmap = gdk_pixmap_create_from_xpm_d (parent->window,
+ 					     &mask,
+--- cinepaint/app/signal_type.c.orig	2004-02-09 21:25:13.000000000 +0100
++++ cinepaint/app/signal_type.c	2024-11-21 21:10:20.156687209 +0100
+@@ -51,7 +51,7 @@ static TypeArr pointer_types={
+ };
+ 
+ static GimpSignalType sigtype_pointer={
+-	gimp_marshaller_pointer,
++	(GtkSignalMarshaller)gimp_marshaller_pointer,
+ 	GTK_TYPE_NONE,
+ 	1,
+ 	pointer_types
+@@ -75,7 +75,7 @@ static TypeArr int_types={
+ };
+ 
+ static GimpSignalType sigtype_int={
+-	gimp_marshaller_int,
++	(GtkSignalMarshaller)gimp_marshaller_int,
+ 	GTK_TYPE_NONE,
+ 	1,
+ 	int_types
+@@ -105,7 +105,7 @@ static TypeArr int_int_int_int_types={
+ };
+ 	
+ static GimpSignalType sigtype_int_int_int_int={
+-	gimp_marshaller_int_int_int_int,
++	(GtkSignalMarshaller)gimp_marshaller_int_int_int_int,
+ 	GTK_TYPE_NONE,
+ 	4,
+ 	int_int_int_int_types
+--- cinepaint/app/store_frame_manager.c.orig	2024-11-17 21:35:00.594514997 +0100
++++ cinepaint/app/store_frame_manager.c	2024-11-21 21:43:07.146709174 +0100
+@@ -559,9 +559,9 @@ sfm_create_gui (GDisplay *disp)
+ #if GTK_MAJOR_VERSION > 1
+   disp->bfm->sfm->status_label = gtk_label_new ("");
+   gtk_widget_set_size_request ( disp->bfm->sfm->status_label, 40, 10);
+-  gtk_label_set_justify       ( disp->bfm->sfm->status_label,
++  gtk_label_set_justify       ( GTK_LABEL(disp->bfm->sfm->status_label),
+                                 GTK_JUSTIFY_LEFT );
+-  gtk_widget_set_size_request ( GTK_BOX (GTK_DIALOG (disp->bfm->sfm->shell)->action_area), 20, 10);
++  gtk_widget_set_size_request ( GTK_DIALOG (disp->bfm->sfm->shell)->action_area, 20, 10);
+ //  event_box = gtk_event_box_new ();
+   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (disp->bfm->sfm->shell)->action_area),
+ //                      event_box,
+@@ -749,7 +749,7 @@ sfm_play_forward (GDisplay* gdisplay)
+         /* show the frame rate in the bottom of the flipbook */
+         fm->fps = 1./ (c3 - c1);
+         sprintf( text,"%s: %.02f", _("Fps"), fm->fps);
+-        gtk_label_set_text( fm->status_label, text );
++        gtk_label_set_text( GTK_LABEL(fm->status_label), text );
+       }
+ #if 0
+       /* seems not the right thing */
+@@ -757,7 +757,7 @@ sfm_play_forward (GDisplay* gdisplay)
+                                   (GtkFunction) sfm_forward, gdisplay);
+ #endif
+       ms_timeout = 0;
+-      gtk_label_set_text( fm->status_label, "" );
++      gtk_label_set_text( GTK_LABEL(fm->status_label), "" );
+     }
+ }
+ 
+--- cinepaint/plug-ins/pygimp/gimpmodule.c.orig	2007-10-25 12:24:30.000000000 +0200
++++ cinepaint/plug-ins/pygimp/gimpmodule.c	2024-11-23 08:40:19.997020458 +0100
+@@ -757,7 +757,7 @@ pdb_repr(self)
+ 
+ /* Code to access pdb objects as mappings */
+ 
+-static int
++static ssize_t
+ pdb_length(self)
+ 	pdbobject *self;
+ {
+@@ -795,7 +795,7 @@ pdb_ass_sub(self, v, w)
+ }
+ 
+ static PyMappingMethods pdb_as_mapping = {
+-	(inquiry)pdb_length,		/*mp_length*/
++	(lenfunc)pdb_length,		/*mp_length*/
+ 	(binaryfunc)pdb_subscript,		/*mp_subscript*/
+ 	(objobjargproc)pdb_ass_sub,	/*mp_ass_subscript*/
+ };
+@@ -2786,7 +2786,7 @@ tile_repr(self)
+ 	return s;
+ }
+ 
+-static int
++static ssize_t
+ tile_length(self)
+ 	tileobject *self;
+ {
+@@ -2874,7 +2874,7 @@ tile_ass_sub(self, v, w)
+ }
+ 
+ static PyMappingMethods tile_as_mapping = {
+-	(inquiry)tile_length, /*length*/
++	(lenfunc)tile_length, /*length*/
+ 	(binaryfunc)tile_subscript, /*subscript*/
+ 	(objobjargproc)tile_ass_sub, /*ass_sub*/
+ };
+@@ -2982,7 +2982,7 @@ pr_subscript(self, key)
+ 	GPixelRgn *pr = &(self->pr);
+ 	int bpp = pr->bpp;
+ 	PyObject *x, *y;
+-	int x1, y1, x2, y2, xs, ys;
++	ssize_t x1, y1, x2, y2, xs, ys;
+ 
+ 	if (!PyTuple_Check(key) || PyTuple_Size(key) != 2) {
+ 		PyErr_SetString(PyExc_TypeError,"subscript must be a 2-tuple.");
+@@ -3083,7 +3083,7 @@ pr_ass_sub(self, v, w)
+ 	int bpp = pr->bpp;
+ 	PyObject *x, *y;
+ 	char *buf;
+-	int len, x1, x2, xs, y1, y2, ys;
++	ssize_t len, x1, x2, xs, y1, y2, ys;
+ 	
+ 	if (w == NULL) {
+ 		PyErr_SetString(PyExc_TypeError, "can't delete subscripts.");
+@@ -3195,7 +3195,7 @@ pr_ass_sub(self, v, w)
+ }
+ 
+ static PyMappingMethods pr_as_mapping = {
+-	(inquiry)pr_length,		/*mp_length*/
++	(lenfunc)pr_length,		/*mp_length*/
+ 	(binaryfunc)pr_subscript,		/*mp_subscript*/
+ 	(objobjargproc)pr_ass_sub,	/*mp_ass_subscript*/
+ };
